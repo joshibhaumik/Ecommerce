@@ -1,0 +1,24 @@
+{
+  "name": "Ecommerce",
+  "version": "1.0.0",
+  "description": "Ecommerce website with ReactJS, Redux, NodeJS, MongoDB.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshibhaumik/Ecommerce.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joshibhaumik/Ecommerce/issues"
+  },
+  "homepage": "https://github.com/joshibhaumik/Ecommerce#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
