@@ -18,7 +18,5 @@
     "url": "https://github.com/joshibhaumik/Ecommerce/issues"
   },
   "homepage": "https://github.com/joshibhaumik/Ecommerce#readme",
-  "dependencies": {
-    "express": "^4.17.1"
-  }
+  "dependencies": {}
 }

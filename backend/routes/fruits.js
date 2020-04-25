@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 
 const Fruits = require("../models/fruits");
+const auth = require('../authenticate');
 
 router.use(bodyParser.json());
 
@@ -20,7 +21,7 @@ router
       )
       .catch(err => next(err));
   })
-  .post((req, res, next) => {
+  .post(auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
     Fruits.create(req.body)
       .then(
         fruit => {
@@ -36,7 +37,7 @@ router
     res.statusCode = 403;
     res.end("PUT operation not supported on /fruits");
   })
-  .delete((req, res, next) => {
+  .delete(auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
     Fruits.remove({})
       .then(
         resp => {
@@ -64,7 +65,7 @@ router
     res.statusCode = 403;
     res.end("POST operation not supported on /fruits/" + req.params.fruitsId);
   })
-  .put((req, res, next) => {
+  .put(auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
     Fruits.findByIdAndUpdate(
       req.params.fruitsId,
       {
@@ -78,7 +79,7 @@ router
     },e=>next(e))
     .catch(e => next(e));
   })
-  .delete((req, res, next) => {
+  .delete(auth.verifyUser, auth.verifyAdmin, (req, res, next) => {
     Fruits.findByIdAndRemove(req.params.fruitsId)
         .then(
           resp => {
