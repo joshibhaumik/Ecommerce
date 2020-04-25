@@ -3,11 +3,19 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const itemsRouter = require('./routes/items');
 const config = require('./config');
+const connect = mongoose.connect(config.url);
+
+connect
+.then(() => {
+  console.log('Connected correctly to server');
+})
+.catch(err=>next(err));
 
 var app = express();
 

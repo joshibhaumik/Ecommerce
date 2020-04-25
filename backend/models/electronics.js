@@ -1,0 +1,39 @@
+const mongoos = require('mongoose');
+const Schema = mongoos.Schema;
+require('mongoose-currency').loadType(mongoose);
+const Currency = mongoose.Types.Currency;
+
+const electronicSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    image: {
+        type: String,
+        required: true
+    },
+    label: {
+        type: String,
+        default: ''
+    },
+    price: {
+        type: Currency,
+        required: true,
+        min: 0
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 0,
+        max: 5,
+    }
+},{
+    timestamps:true
+});
+
+module.exports = mongoose.model('Electronic', electronicSchema);
