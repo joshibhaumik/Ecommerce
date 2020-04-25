@@ -34,7 +34,7 @@ class Register extends Component {
             <div className="card-body">
               <form onSubmit={this.handleSubmit.bind(this)}>
                 <div className="form-group">
-                  <label for="email">Email address</label>
+                  <label htmlFor="email">Email address</label>
                   <input
                     type="email"
                     className="form-control"
@@ -65,7 +65,7 @@ class Register extends Component {
                   )}
                 </div>
                 <div className="form-group">
-                  <label for="password">Password</label>
+                  <label htmlFor="password">Password</label>
                   <input
                     type="password"
                     className="form-control"
@@ -96,7 +96,7 @@ class Register extends Component {
                   )}
                 </div>
                 <div className="form-group">
-                  <label for="cpassword">Confirm Password</label>
+                  <label htmlFor="cpassword">Confirm Password</label>
                   <input
                     type="password"
                     className="form-control"

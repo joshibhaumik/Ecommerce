@@ -9,6 +9,9 @@ import ForgotPassword from './accounts/FrogotPassword'
 import Register from './accounts/Register';
 import TermsConditions from './accounts/TermsConditions';
 
+import { Provider } from 'react-redux';
+import store from '../store';
+
 class App extends Component {
 state = {
     data: null
@@ -33,17 +36,19 @@ state = {
 
   render() {
     return (
-      <Router>
-        <Navbar authenticate={false}/>
-        <div className="container-fluid">
-            <Switch>
-              <Route exact strict path="/" component={Login}/>
-              <Route path="/register" component={Register}/>
-              <Route path="/forgot_password" component={ForgotPassword}/>
-              <Route path="/terms_conditions" component={TermsConditions}/>
-            </Switch>
-        </div>
-      </Router>
+      <Provider store={store}>
+        <Router>
+          <Navbar authenticate={false}/>
+          <div className="container-fluid">
+              <Switch>
+                <Route exact strict path="/" component={Login}/>
+                <Route path="/register" component={Register}/>
+                <Route path="/forgot_password" component={ForgotPassword}/>
+                <Route path="/terms_conditions" component={TermsConditions}/>
+              </Switch>
+          </div>
+        </Router>
+      </Provider>
     );
   }
 }
