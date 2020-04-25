@@ -1,40 +1,94 @@
-const express = require('express');
+const express = require("express");
+const bodyParser = require("body-parser");
 const router = express.Router();
 
-router.route('/')
-.get((req, res, next) => {
-    res.statusCode = 200;
-    res.send("/get to electronics");
-})
-.post((req, res, next) => {
-    res.statusCode = 200;
-    res.send("/post to electronics with "+req.body);
-})
-.put((req, res, next) => {
-    res.statusCode = 500;
-    res.send("put operation not supported");
-})
-.delete((req, res, next) => {
-    res.statusCode = 200;
-    res.send("warning deleting all electronics");
-});
+const Electronics = require("../models/electronics");
 
-router.route('/:electronicsId')
-.get((req, res, next) => {
-    res.statusCode = 200;
-    res.send("/get to electronics with id "+req.params.electronicsId);
-})
-.post((req, res, next) => {
-    res.statusCode = 200;
-    res.send("/post to electronics with id "+req.params.electronicsId+ " with "+ req.body);
-})
-.put((req, res, next) => {
-    res.statusCode = 200;
-    res.send("/put to electronics with id "+req.params.electronicsId);
-})
-.delete((req, res, next) => {
-    res.statusCode = 200;
-    res.send("/delete electronics with id "+req.params.electronicsId);
-});
+router.use(bodyParser.json());
+
+router
+  .route("/")
+  .get((req, res, next) => {
+    Electronics.find({})
+      .then(
+        electronics => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.send(electronics);
+        },
+        err => next(err)
+      )
+      .catch(err => next(err));
+  })
+  .post((req, res, next) => {
+    Electronics.create(req.body)
+      .then(
+        ele => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.send(ele);
+        },
+        err => next(err)
+      )
+      .catch(err => next(err));
+  })
+  .put((req, res, next) => {
+    res.statusCode = 403;
+    res.end("PUT operation not supported on /electronics");
+  })
+  .delete((req, res, next) => {
+    Electronics.remove({})
+      .then(
+        resp => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(resp);
+        },
+        err => next(err)
+      )
+      .catch(err => next(err));
+  });
+
+router
+  .route("/:electronicsId")
+  .get((req, res, next) => {
+    Electronics.findById(req.params.electronicsId)
+      .then(ele => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.send(ele);
+      },e=>next(e))
+      .catch(e => next(e));
+  })
+  .post((req, res, next) => {
+    res.statusCode = 403;
+    res.end("POST operation not supported on /electronics/" + req.params.electronicsId);
+  })
+  .put((req, res, next) => {
+    Electronics.findByIdAndUpdate(
+      req.params.electronicsId,
+      {
+        $set: req.body
+      },
+      { new: true }
+    ).then(ele=> {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.send(ele);
+    },e=>next(e))
+    .catch(e => next(e));
+  })
+  .delete((req, res, next) => {
+    Electronics.findByIdAndRemove(req.params.electronicsId)
+        .then(
+          resp => {
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.json(resp);
+          },
+          err => next(err)
+        )
+        .catch(err => next(err));
+  });
 
 module.exports = router;
