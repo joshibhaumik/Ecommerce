@@ -1,4 +1,4 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 var passport = require("passport");
 
@@ -9,10 +9,15 @@ var authenticate = require("../authenticate");
 router.use(bodyParser.json());
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.get(authenticate.verifyUser, authenticate.verifyAdmin, "/", function(req, res, next) {
+  User.find({})
+  .then(users => {
+    res.statusCode = 200;
+    res.setHeader('Content-Type','application/json');
+    res.send(users);
+  },e=>next(e))
+  .catch(e=>next(e));
 });
-
 
 router.post("/signup", (req, res, next) => {
   User.register(
@@ -20,7 +25,7 @@ router.post("/signup", (req, res, next) => {
       username: req.body.username,
       firstname: req.body.firstname,
       lastname: req.body.lastname,
-      email: req.body.email,
+      email: req.body.email
     }),
     req.body.password,
     (err, user) => {
@@ -39,7 +44,7 @@ router.post("/signup", (req, res, next) => {
           passport.authenticate("local")(req, res, () => {
             res.statusCode = 200;
             res.setHeader("Content-Type", "application/json");
-            res.json({ success: true, status: "Registration Successful!" });
+            res.json({ status: true, message: "Registration Successful!" });
           });
         });
       }
@@ -52,10 +57,82 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");
   res.json({
-    success: true,
+    status: true,
     token: token,
-    status: "You are successfully logged in!"
+    message: "You are successfully logged in!"
   });
 });
+
+router.post(authenticate.verifyUser, "/create-store", (req, res, next) => {
+  if (req.user.hasStore) {
+    res.statusCode = 403;
+    res.setHeader("Content-Type", "application/json");
+    res.end({ message: "You have already created the store", status: false });
+  } else {
+    User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $set: {
+          hasStore: true
+        }
+      },
+      { new: true }
+    )
+      .then(
+        user => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end({ message: "Created Store Successfully", status: true });
+        },
+        e => next(e)
+      )
+      .catch(e > next(e));
+  }
+});
+
+router.route('/store')
+.get(authenticate.verifyUser, (req, res, next) => {
+  
+})
+.post(authenticate.verifyUser, (req, res, next) => {
+  User.findById(req.user._id)
+  .then(user => {
+    user.store.push(req.body);
+    user.save()
+    .then(user=>{
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.send({data: user, message: null, status: true});
+    }, e=>next(e))
+    .catch(e=>next(e));
+  },e=>next(e))
+  .catch(e=>next(e));
+})
+.put((req, res, next) => {
+  res.statusCode = 403;
+  res.setHeader('Content-Type', 'application/json');
+  res.send({message:"PUT method is not allowed on /store", status:false});
+})
+.delete(authenticate.verifyUser, (req, res, next) => {
+  User.findById(req.user._id)
+  .then(user => {
+    user.store = [];
+    user.hasStore = false;
+    user.save()
+    .then(user => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.send({message:"Your Store has been deleted successfully", status:true});
+    },e=>next(e))
+    .catch(e=>next(e));
+  },e=>next(e))
+  .catch(e=>next(e));
+});
+
+router.route('/store/itemId')
+.get(authenticate.verifyUser)
+.post()
+.put()
+.delete();
 
 module.exports = router;
