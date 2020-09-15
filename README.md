@@ -1,2 +1,2 @@
-# Ecommerce
-Ecommerce website with ReactJS, Redux, NodeJS, MongoDB.
+# OnlineStore
+OnlineStore website with ReactJS, Redux, NodeJS, MongoDB.
