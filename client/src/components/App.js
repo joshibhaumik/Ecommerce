@@ -1,12 +1,19 @@
-import React from 'react';
-import '../styles/App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+import "../styles/App.css";
 
 function App() {
-  return (
-    <div>
-      React App
-    </div>
-  );
+  const [message, setMessage] = useState("");
+  const [loading, toggleLoading] = useState(true);
+  useEffect(() => {
+    document.title = "Welcome";
+    axios.get("/api/").then(e => {
+      setMessage(e.data.message);
+      toggleLoading(false);
+    });
+  }, []);
+  return <div>{loading ? "Loading..." : message}</div>;
 }
 
 export default App;
