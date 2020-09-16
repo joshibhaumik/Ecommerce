@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Items = require("./Items");
 
 const userSchema = new mongoose.Schema(
   {
@@ -22,6 +23,7 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    cart: [Items],
     image: {
       type: String
     }
