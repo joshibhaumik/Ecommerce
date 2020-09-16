@@ -1,5 +1,6 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require("body-parser");
+const Comments = require("../models/Comments");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -10,21 +11,47 @@ router.use(bodyParser.json());
 */
 router
   .route("/")
-  .get((req, res, next) => {
+  .get(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: "Return all the comments" });
+    try {
+      let comments = await Comments.find({});
+      res.json({ status: true, payload: comments, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   })
-  .post((req, res, next) => {
+  .post(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: "Comment Added" });
+    try {
+      let comment = await Comments.create(req.body);
+      res.json({ status: true, payload: comment, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   })
   .put((req, res, next) => {
-    res.statusCode = 403;
-    res.end("PUT operation not allowed");
-  })
-  .delete((req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: "Delete all the Comments" });
+    res.json({
+      status: false,
+      payload: {},
+      error: "PUT operation not allowed"
+    });
+  })
+  .delete(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
+    res.statusCode = 200;
+    try {
+      let comments = await Comments.remove({});
+      res.json({ status: true, payload: comments, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   });
 
 /*
@@ -33,23 +60,51 @@ router
 */
 router
   .route("/:commentId")
-  .get((req, res, next) => {
+  .get(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({
-      message: `Get the Comment with Comment Id = ${req.params.commentId}`
-    });
+    try {
+      let comment = await Comments.findById(req.params.commentId);
+      res.json({ status: true, payload: comment, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   })
   .post((req, res, next) => {
-    res.statusCode = 403;
-    res.end("POST operation not supported");
-  })
-  .put((req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: `Update Comment with Comment id = ${req.params.commentId}` });
+    res.json({
+      status: false,
+      payload: {},
+      error: "POST operation not allowed"
+    });
   })
-  .delete((req, res, next) => {
+  .put(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: `Delete Comment with Comment id = ${req.params.commentId}` });
+    try {
+      let comment = await Comments.findByIdAndUpdate(
+        req.params.commentId,
+        { $set: req.body },
+        { new: true }
+      );
+      res.json({ status: true, payload: comment, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
+  })
+  .delete(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
+    res.statusCode = 200;
+    try {
+      let comment = await Comments.findByIdAndRemove(req.params.commentId);
+      res.json({ status: true, payload: comment, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   });
 
-  module.exports = router;
+module.exports = router;

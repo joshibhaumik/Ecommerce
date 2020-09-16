@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyparser = require("body-parser");
+const Store = require("../models/Stores");
 
 const router = express.Router();
 router.use(bodyparser.json());
@@ -10,21 +11,47 @@ router.use(bodyparser.json());
 */
 router
   .route("/")
-  .get((req, res, next) => {
+  .get(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: "Return all the stores" });
+    try {
+      let stores = await Store.find({});
+      res.json({ status: true, payload: stores, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   })
-  .post((req, res, next) => {
+  .post(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: "Store Created" });
+    try {
+      let store = await Store.create(req.body);
+      res.json({ status: true, payload: store, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   })
   .put((req, res, next) => {
-    res.statusCode = 403;
-    res.end("PUT operation not allowed");
-  })
-  .delete((req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: "Delete all the Stores" });
+    res.json({
+      status: false,
+      payload: {},
+      error: "PUT operation not allowed"
+    });
+  })
+  .delete(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
+    res.statusCode = 200;
+    try {
+      let stores = await Store.remove({});
+      res.json({ status: true, payload: stores, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   });
 
 /*
@@ -33,23 +60,51 @@ router
 */
 router
   .route("/:storeId")
-  .get((req, res, next) => {
+  .get(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({
-      message: `Get the Store with Store Id = ${req.params.storeId}`
-    });
+    try {
+      let store = await Store.findById(req.params.storeId);
+      res.json({ status: true, payload: store, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   })
   .post((req, res, next) => {
-    res.statusCode = 403;
-    res.end("POST operation not supported");
-  })
-  .put((req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: `Update store with store id = ${req.params.storeId}` });
+    res.json({
+      status: false,
+      payload: {},
+      error: "POST operation not allowed"
+    });
   })
-  .delete((req, res, next) => {
+  .put(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    res.json({ message: `Delete store with store id = ${req.params.storeId}` });
+    try {
+      let store = await Store.findByIdAndUpdate(
+        req.params.storeId,
+        { $set: req.body },
+        { new: true }
+      );
+      res.json({ status: true, payload: store, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
+  })
+  .delete(async (req, res, next) => {
+    res.setHeader("Content-Type", "application/json");
+    res.statusCode = 200;
+    try {
+      let store = await Store.findByIdAndRemove(req.params.storeId);
+      res.json({ status: true, payload: store, error: "" });
+    } catch (error) {
+      res.json({ status: false, payload: {}, error: error });
+      next(error);
+    }
   });
 
 module.exports = router;
