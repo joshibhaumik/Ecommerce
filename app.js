@@ -14,6 +14,7 @@ connect();
 const storeRouter = require("./routes/store");
 const usersRouter = require("./routes/users");
 const itemsRouter = require("./routes/items");
+const commentRouter = require("./routes/comments");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/store", storeRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/items", itemsRouter);
+app.use("/api/comments", commentRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
