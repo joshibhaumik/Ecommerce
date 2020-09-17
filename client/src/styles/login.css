@@ -1,0 +1,14 @@
+.login-link {
+    background-color: #db4a39;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.login-link:hover {
+    background-color: #db4b39;
+    color: rgba(255, 255, 255, 0.89);
+    text-decoration: none;
+}
