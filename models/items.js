@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Comments = require("./Comments");
+const Comments = require("./Comments").schema;
 
 const items = new mongoose.Schema(
   {
@@ -26,17 +26,24 @@ const items = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: true
+      required: true,
+      enum: ["vegetables","groceries","electronics","stationery","fruits"]
     },
-    img: {
+    image: {
       type: String,
       required: true
     },
     store: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Store"
+      ref: "Store",
+      required:true
     },
-    comments: [Comments]
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      }
+    ]
   },
   {
     timestamps: true

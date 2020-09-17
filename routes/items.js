@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const Items = require("../models/Items");
+const Store = require("../models/Stores");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -26,7 +27,10 @@ router
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
+      let store = await Store.findById(req.body.store);
       let item = await Items.create(req.body);
+      store.items.push(item);
+      let succ = await store.save();
       res.json({ status: true, payload: item, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });

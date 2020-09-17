@@ -116,11 +116,15 @@ router.get("/login", (req, res, next) => {
   res.json({ message: "Login route" });
 });
 
+router.get('/google',()=> {
+
+});
+
 /*
   @route /api/users/logout
   @desc To logout the user
 */
-router.get("/login", (req, res, next) => {
+router.get("/logout", (req, res, next) => {
   res.statusCode = 200;
   res.json({ message: "Logged out" });
 });

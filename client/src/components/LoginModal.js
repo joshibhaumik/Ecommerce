@@ -16,7 +16,7 @@ function Login(props) {
             bulk of the card's content.
           </Card.Text>
           <div style={{ textAlign: "center", marginTop:30 }}>
-            <a href="/api/users/google" className="login-link">Login with Google+</a>
+            <a href="/api/users/login" className="login-link">Login with Google+</a>
           </div>
         </Card.Body>
       </Card>

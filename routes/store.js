@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyparser = require("body-parser");
 const Store = require("../models/Stores");
+const User = require("../models/Users");
 
 const router = express.Router();
 router.use(bodyparser.json());
@@ -25,11 +26,18 @@ router
   .post(async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    try {
+    try {      
+      let user = await User.findById(req.body.user);
       let store = await Store.create(req.body);
-      res.json({ status: true, payload: store, error: "" });
+      if(user.store === undefined) {
+        user.store = store._id;
+        let succ = await user.save();
+        res.json({ status: true, payload: store, error: "" });
+      } else {
+        res.json({ status: false, payload: [], error: "You already have a Store, please use that to sell Items" });
+      }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
+      res.json({ status: false, payload: [], error: error });
       next(error);
     }
   })

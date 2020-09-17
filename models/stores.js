@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Items = require("./Items");
+const Items = require("./Items").schema;
 
 const storeSchema = new mongoose.Schema(
   {
@@ -15,10 +15,16 @@ const storeSchema = new mongoose.Schema(
       maxlength: 500
     },
     user: {
-      type: mongoose.mongo.Schema.Types.ObjectId,
-      reF: "User"
+      type: mongoose.Schema.Types.ObjectId,
+      reF: "User",
+      required:true
     },
-    items: [Items]
+    items: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Item"
+      }
+    ]
   },
   {
     timestamps: true

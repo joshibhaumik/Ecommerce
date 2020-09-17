@@ -4,11 +4,13 @@ const commentSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      ref: "User",
+      required:true
     },
     item: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Item"
+      ref: "Item",
+      required:true
     },
     comment: {
       type: String,
@@ -16,7 +18,9 @@ const commentSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
-      required: true
+      required: true,
+      min:1,
+      max:5
     }
   },
   { timestamps: true }
