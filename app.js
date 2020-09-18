@@ -4,17 +4,25 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const dotenv = require("dotenv");
+const passport = require("passport");
+const session = require("express-session");
 
 const connect = require("./connectToDB");
+const auth = require("./authenticate");
 
-dotenv.config({ path: "config.env" });
-
-connect();
-
+const indexRouter = require("./routes/index");
+const authRouter = require("./routes/authentication");
 const storeRouter = require("./routes/store");
 const usersRouter = require("./routes/users");
 const itemsRouter = require("./routes/items");
 const commentRouter = require("./routes/comments");
+
+dotenv.config({ path: "config.env" });
+
+// Authenticate
+auth(passport);
+
+connect();
 
 const app = express();
 
@@ -22,8 +30,17 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(session({
+  secret: 'online store',
+  resave: false,
+  saveUninitialized: false,
+}))
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use("/", indexRouter);
+app.use("/auth", authRouter);
 app.use("/api/store", storeRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/items", itemsRouter);

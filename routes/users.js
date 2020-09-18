@@ -125,24 +125,4 @@ router
     }
   });
 
-/*
-  @route /api/users/login
-  @desc user login using google OAuth 2.0
-*/
-router.get("/login", (req, res, next) => {
-  res.statusCode = 200;
-  res.json({ message: "Login route" });
-});
-
-router.get("/google", () => {});
-
-/*
-  @route /api/users/logout
-  @desc To logout the user
-*/
-router.get("/logout", (req, res, next) => {
-  res.statusCode = 200;
-  res.json({ message: "Logged out" });
-});
-
 module.exports = router;
