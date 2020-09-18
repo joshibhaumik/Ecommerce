@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const Items = require("../models/Items");
 const Store = require("../models/Stores");
+const Comments = require("../models/Comments");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -28,10 +29,18 @@ router
     res.statusCode = 200;
     try {
       let store = await Store.findById(req.body.store);
-      let item = await Items.create(req.body);
-      store.items.push(item);
-      let succ = await store.save();
-      res.json({ status: true, payload: item, error: "" });
+      if (store === null) {
+        res.json({
+          status: false,
+          payload: [],
+          error: "Store does not exists"
+        });
+      } else {
+        let item = await Items.create(req.body);
+        store.items.push(item);
+        let succ = await store.save();
+        res.json({ status: true, payload: item, error: "" });
+      }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
@@ -51,6 +60,7 @@ router
     res.statusCode = 200;
     try {
       let items = await Items.remove({});
+      let comments = await Comments.remove({});
       res.json({ status: true, payload: items, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
@@ -69,7 +79,11 @@ router
     res.statusCode = 200;
     try {
       let item = await Items.findById(req.params.itemId);
-      res.json({ status: true, payload: item, error: "" });
+      if (item === null) {
+        res.json({ status: false, payload: [], error: "Item does not exists" });
+      } else {
+        res.json({ status: true, payload: item, error: "" });
+      }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
@@ -88,12 +102,21 @@ router
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let item = await Items.findByIdAndUpdate(
-        req.params.itemId,
-        { $set: req.body },
-        { new: true }
-      );
-      res.json({ status: true, payload: item, error: "" });
+      let store = await Store.findById(req.body.store);
+      if(store === null) {
+        res.json({status:false, payload:[], error:"Store does not exists"});
+      } else {
+        let item = await Items.findByIdAndUpdate(
+          req.params.itemId,
+          { $set: req.body },
+          { new: true }
+        );
+        if(item === null) {
+          res.json({ status: false, payload: [], error: "Item does not exists" });
+        } else {
+          res.json({ status: true, payload: item, error: "" });
+        }
+      }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
@@ -103,8 +126,16 @@ router
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let item = await Items.findByIdAndRemove(req.params.itemId);
-      res.json({ status: true, payload: item, error: "" });
+      const item = await Items.findByIdAndRemove(req.params.itemId);
+      if (item === null) {
+        res.json({ status: false, payload: [], error: "Item does not exists" });
+      } else {
+        const comments = await Comments.remove({ item: item._id });
+        const store = await Store.findById(item.store);
+        store.items.pull(String(item._id));
+        const succ = await store.save();
+        res.json({ status: true, payload: item, error: "" });
+      }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);

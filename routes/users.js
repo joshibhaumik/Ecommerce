@@ -1,6 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const User = require("../models/Users");
+const Items = require("../models/Items");
+const Store = require("../models/Stores");
+const Comments = require("../models/Comments");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -47,6 +50,9 @@ router
     res.statusCode = 200;
     try {
       let users = await User.remove({});
+      let stores = await Store.remove({});
+      let items = await Items.remove({});
+      let comments = await Comments.remove({});
       res.json({ status: true, payload: users, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
@@ -65,7 +71,11 @@ router
     res.statusCode = 200;
     try {
       let user = await User.findById(req.params.userId);
-      res.json({ status: true, payload: user, error: "" });
+      if (user === null) {
+        res.json({ status: false, payload: [], error: "User does not exists" });
+      } else {
+        res.json({ status: true, payload: user, error: "" });
+      }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
@@ -83,24 +93,32 @@ router
   .put(async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
-    try {
-      let user = await User.findByIdAndUpdate(
-        req.params.userId,
-        { $set: req.body },
-        { new: true }
-      );
-      res.json({ status: true, payload: user, error: "" });
-    } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
-    }
+    res.json({
+      status: false,
+      payload: {},
+      error: "PUT operation not allowed for Google OAuth"
+    });
   })
   .delete(async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let user = await User.findByIdAndRemove(req.params.userId);
-      res.json({ status: true, payload: user, error: "" });
+      const user = await User.findByIdAndRemove(req.params.userId);
+      if (user === null) {
+        res.json({ status: false, payload: [], error: "User does not exists" });
+      } else {
+        const store = await Store.findByIdAndRemove(user.store);
+        if (store !== null) {
+          const items_ = await Items.find({ store: store._id });
+          if (items_.length !== 0) {
+            for (let item of items_) {
+              const comments = await Comments.remove({ item: item._id });
+            }
+            const items = await Items.remove({ store: store._id });
+          }
+        }
+        res.json({ status: true, payload: user, error: "" });
+      }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
@@ -116,9 +134,7 @@ router.get("/login", (req, res, next) => {
   res.json({ message: "Login route" });
 });
 
-router.get('/google',()=> {
-
-});
+router.get("/google", () => {});
 
 /*
   @route /api/users/logout
