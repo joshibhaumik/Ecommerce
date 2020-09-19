@@ -3,6 +3,9 @@ import { Modal, Card } from "react-bootstrap";
 import "../styles/login.css";
 
 function Login(props) {
+  const redirect = () => {
+    window.location.href = "http://localhost:5000/auth/login";
+  }
   return (
     <Modal show={props.show} onHide={props.handleClose} animation={true}>
       <Card>
@@ -16,7 +19,7 @@ function Login(props) {
             bulk of the card's content.
           </Card.Text>
           <div style={{ textAlign: "center", marginTop:30 }}>
-            <a href="/api/users/login" className="login-link">Login with Google+</a>
+            <button onClick={redirect} className="login-link">Login with Google+</button>
           </div>
         </Card.Body>
       </Card>

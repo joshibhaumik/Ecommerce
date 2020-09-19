@@ -29,22 +29,23 @@ const app = express();
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(cookieParser("12345-67890-09876-54321"));
+
 app.use(session({
   secret: 'online store',
   resave: false,
   saveUninitialized: false,
 }))
+
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
-app.use("/auth", authRouter);
-app.use("/api/store", storeRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/store", storeRouter);
 app.use("/api/items", itemsRouter);
 app.use("/api/comments", commentRouter);
+app.use("/auth", authRouter);
+app.use("/", indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -59,7 +60,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.send("Error Encountered!");
+  res.send(err);
 });
 
 module.exports = app;
