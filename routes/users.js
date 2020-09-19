@@ -125,4 +125,80 @@ router
     }
   });
 
+/*
+  @route /api/users/cart/userId
+  @desc add and remove an item from the user cart
+*/
+router.route("/cart/:userId")
+.post(async (req, res, next) => {
+  res.setHeader("Content-Type","application/json");
+  res.statusCode = 200;
+  try {
+   const user = await User.findById(req.params.userId);
+   const item = await Items.findById(req.body._id);
+   if(user === null) {
+    res.json({
+      status:false,
+      payload:[],
+      error: "User does not exists"
+    });
+   } else if(item === null) {
+    res.json({
+      status:false,
+      payload:[],
+      error: "Item you are trying to add does not exists"
+    });
+   } else {
+    user.cart.push(item);
+    const succ = await user.save();
+    res.json({
+      status:true,
+      payload:item,
+      error:""
+    });
+   }
+  } catch (error) {
+    res.json({
+      status:false,
+      payload:[],
+      error: error
+    });
+  }
+})
+.delete(async (req, res, next) => {
+  res.setHeader("Content-Type","application/json");
+  res.statusCode = 200;
+  try {
+    const user = await User.findById(req.params.userId);
+    const item = await Items.findById(req.params._id);
+    if(user === null) {
+      res.json({
+        status:false,
+        payload:[],
+        error: "User does not exists"
+      });
+    } else if(item === null) {
+      res.json({
+        status:false,
+        payload:[],
+        error: "Item you are trying to delete does not exists in the cart"
+      });
+    } else {
+      user.cart.pull(item._id);
+      const succ = await user.save();
+      res.json({
+        status:true,
+        payload:item,
+        error:""
+      });
+    }
+  } catch (error) {
+    res.json({
+      status:false,
+      payload:[],
+      error: error
+    });
+  }
+});
+
 module.exports = router;
