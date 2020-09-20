@@ -1,11 +1,13 @@
 const createError = require("http-errors");
 const express = require("express");
+const mongoose = require("mongoose");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const dotenv = require("dotenv");
 const passport = require("passport");
 const session = require("express-session");
+const MongoStore = require("connect-mongo")(session);
 
 const connect = require("./connectToDB");
 const auth = require("./authenticate");
@@ -35,6 +37,7 @@ app.use(session({
   secret: 'online store',
   resave: false,
   saveUninitialized: false,
+  store: new MongoStore({ mongooseConnection : mongoose.connection})
 }))
 
 app.use(passport.initialize());

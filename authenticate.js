@@ -25,7 +25,7 @@ exports.validateGoogle = passport => {
             let user_ = await User.create(newUser);
             next(null, user_);
           } else {
-            next(null, user_);
+            next(null, user);
           }
         } catch (error) {
           console.log(error);
@@ -52,7 +52,10 @@ exports.validateAdmin = (req, res, next) => {
   }
 };
 
-exports.verifyUser = passport.authenticate("google", {
-  scope: 'https://www.googleapis.com/auth/plus.login',
-  failureRedirect: "http://localhost:5000/auth/login"
-});
+exports.verifyUser = (req, res, next)=> {
+  if(req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect("/auth/login");
+  }
+};

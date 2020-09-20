@@ -90,7 +90,7 @@ router
       error: "POST operation not allowed"
     });
   })
-  .put(auth.verifyUser, async (req, res, next) => {
+  .put(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     res.json({
