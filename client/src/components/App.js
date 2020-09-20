@@ -1,16 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import "../styles/App.css";
 
-import Login from "./LoginModal";
+import Main from './Main';
 
 function App() {
-  const [show, toggleShow] = useState(false);
-
-  return (
-    <div>
-      <Login show={show} handleClose={() => toggleShow(false)} />
-    </div>
-  );
+  return <Main />
 }
 
 export default App;

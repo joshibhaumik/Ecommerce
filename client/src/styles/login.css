@@ -4,8 +4,8 @@
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 20px;
-    cursor: pointer;
     border: none;
+    outline:none !important;
 }
 
 .login-link:hover {

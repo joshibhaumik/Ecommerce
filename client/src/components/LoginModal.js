@@ -15,8 +15,12 @@ function Login(props) {
           </Card.Title>
           <hr />
           <Card.Text>
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
+            Welcome to Online Store <br/>
+            <ul>
+              <li>You can see other people items, and can contact them to buy it.</li>
+              <li>You can create your own store and add items to it so that people's can buy them.</li>
+              <li>You can write a review for an item.</li>
+            </ul>
           </Card.Text>
           <div style={{ textAlign: "center", marginTop:30 }}>
             <button onClick={redirect} className="login-link">Login with Google+</button>
