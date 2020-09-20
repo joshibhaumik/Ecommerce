@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const auth = require("../authenticate");
 
 /*
   @route /api/users/login
@@ -16,7 +17,7 @@ router.get(
   "/google",
   passport.authenticate("google", { failureRedirect: "/failure" }),
   (req, res, next) => {
-    res.redirect("/");
+    res.redirect("http://localhost:5000/");
   }
 );
 
@@ -24,7 +25,7 @@ router.get(
   @route /api/users/logout
   @desc To logout the user
 */
-router.get("/logout", (req, res, next) => {
+router.get("/logout", auth.verifyUser, (req, res, next) => {
   try {
     req.logOut();
     res.json({ status: true, payload: [], error: "" });

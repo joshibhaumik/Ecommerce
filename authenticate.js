@@ -1,8 +1,9 @@
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const mongoose = require("mongoose");
 const User = require("./models/Users");
+const passport = require("passport");
 
-module.exports = passport => {
+exports.validateGoogle = passport => {
   passport.use(
     new GoogleStrategy(
       {
@@ -19,8 +20,8 @@ module.exports = passport => {
           image: profile.photos[0].value
         };
         try {
-          let user = await User.findOne({googleId: profile.id});
-          if(user === null) {
+          let user = await User.findOne({ googleId: profile.id });
+          if (user === null) {
             let user_ = await User.create(newUser);
             next(null, user_);
           } else {
@@ -40,3 +41,18 @@ module.exports = passport => {
     User.findById(id, (err, user) => next(err, user))
   );
 };
+
+exports.validateAdmin = (req, res, next) => {
+  if (req.user.isAdmin) {
+    next();
+  } else {
+    let error = new Error("404 No route found!");
+    res.statusCode = 404;
+    next(error);
+  }
+};
+
+exports.verifyUser = passport.authenticate("google", {
+  scope: 'https://www.googleapis.com/auth/plus.login',
+  failureRedirect: "http://localhost:5000/auth/login"
+});

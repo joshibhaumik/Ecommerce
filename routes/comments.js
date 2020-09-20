@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const Comments = require("../models/Comments");
 const Items = require("../models/Items");
 const User = require("../models/Users");
+const auth = require("../authenticate");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -13,7 +14,7 @@ router.use(bodyParser.json());
 */
 router
   .route("/")
-  .get(async (req, res, next) => {
+  .get(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
@@ -24,53 +25,65 @@ router
       next(error);
     }
   })
-  .post(async (req, res, next) => {
+  .post(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let item = await Items.findById(req.body.item);
-      let user = await User.findById(req.body.user);
-      if (user === null) {
-        res.json({ status: false, payload: [], error: "User does not exists" });
-      } else {
-        if (item === null) {
+      if (String(req.user._id) === String(req.body.user)) {
+        const item = await Items.findById(req.body.item);
+        const user = await User.findById(req.body.user);
+        if (user === null) {
           res.json({
             status: false,
             payload: [],
-            error: "Item does not exists"
+            error: "User does not exists"
           });
         } else {
-          const comment_ = await Comments.find({ user: req.body.user }).where(
-            "item",
-            req.body.item
-          );
-          if (comment_.length > 0) {
+          if (item === null) {
             res.json({
               status: false,
               payload: [],
-              error: "You're not allowed to rate an item more then once"
+              error: "Item does not exists"
             });
           } else {
-            let comment = await Comments.create(req.body);
-            item.comments.push(comment);
-            if (item.rating === -1) {
-              item.rating = comment.rating;
+            const comment_ = await Comments.find({ user: req.body.user }).where(
+              "item",
+              req.body.item
+            );
+            if (comment_.length > 0) {
+              res.json({
+                status: false,
+                payload: [],
+                error: "You're not allowed to rate an item more then once"
+              });
             } else {
-              item.rating =
-                (item.rating * (item.comments.length - 1) + comment.rating) /
-                item.comments.length;
+              const comment = await Comments.create(req.body);
+              item.comments.push(comment);
+              if (item.rating === -1) {
+                item.rating = comment.rating;
+              } else {
+                item.rating =
+                  (item.rating * (item.comments.length - 1) + comment.rating) /
+                  item.comments.length;
+              }
+              const succ = await item.save();
+              res.json({ status: true, payload: comment, error: "" });
             }
-            let succ = await item.save();
-            res.json({ status: true, payload: comment, error: "" });
           }
         }
+      } else {
+        res.json({
+          status: false,
+          payload: [],
+          error: "You cannot add comment on other people's behalf"
+        });
       }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
     }
   })
-  .put((req, res, next) => {
+  .put(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     res.json({
@@ -79,7 +92,7 @@ router
       error: "PUT operation not allowed"
     });
   })
-  .delete(async (req, res, next) => {
+  .delete(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
@@ -97,7 +110,7 @@ router
 */
 router
   .route("/:commentId")
-  .get(async (req, res, next) => {
+  .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
@@ -116,7 +129,7 @@ router
       next(error);
     }
   })
-  .post((req, res, next) => {
+  .post(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     res.json({
@@ -125,52 +138,60 @@ router
       error: "POST operation not allowed"
     });
   })
-  .put(async (req, res, next) => {
+  .put(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      const user = User.findById(req.body.user);
-      const item = await Items.findById(req.body.item);
-      if (user === null) {
-        res.json({
-          status: false,
-          payload: [],
-          error: "User does not exists"
-        });
-      } else if (item === null) {
-        res.json({
-          status: false,
-          payload: [],
-          error: "Item does not exists"
-        });
-      } else {
-        const comment = await Comments.findByIdAndUpdate(
-          req.params.commentId,
-          { $set: req.body },
-          { new: true }
-        );
-        if (comment === null) {
+      if (String(req.user._id) === String(req.body.user)) {
+        const user = User.findById(req.body.user);
+        const item = await Items.findById(req.body.item);
+        if (user === null) {
           res.json({
             status: false,
             payload: [],
-            error: "Comment does not exists"
+            error: "User does not exists"
+          });
+        } else if (item === null) {
+          res.json({
+            status: false,
+            payload: [],
+            error: "Item does not exists"
           });
         } else {
-          item.rating =
-            (item.rating * item.comments.length -
-              comment_.rating +
-              comment.rating) /
-            item.comments.length;
-          const succ = await item.save();
-          res.json({ status: true, payload: comment, error: "" });
+          const comment = await Comments.findByIdAndUpdate(
+            req.params.commentId,
+            { $set: req.body },
+            { new: true }
+          );
+          if (comment === null) {
+            res.json({
+              status: false,
+              payload: [],
+              error: "Comment does not exists"
+            });
+          } else {
+            item.rating =
+              (item.rating * item.comments.length -
+                comment_.rating +
+                comment.rating) /
+              item.comments.length;
+            const succ = await item.save();
+            res.json({ status: true, payload: comment, error: "" });
+          }
         }
+      } else {
+        res.json({
+          status: false,
+          payload: [],
+          error: "You cannot modify comment on other people's behalf"
+        });
       }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
     }
   })
-  .delete(async (req, res, next) => {
+  .delete(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
@@ -182,13 +203,21 @@ router
           error: "Comment does not exists"
         });
       } else {
-        let item = await Items.findById(comment.item);
-        item.rating =
-          (item.rating * item.comments.length - comment.rating) /
-          (item.comments.length - 1);
-        item.comments.pull(String(comment._id));
-        let succ = await item.save();
-        res.json({ status: true, payload: comment, error: "" });
+        if (String(req.user._id) === String(comment.user)) {
+          let item = await Items.findById(comment.item);
+          item.rating =
+            (item.rating * item.comments.length - comment.rating) /
+            (item.comments.length - 1);
+          item.comments.pull(String(comment._id));
+          let succ = await item.save();
+          res.json({ status: true, payload: comment, error: "" });
+        } else {
+          res.json({
+            status: false,
+            payload: [],
+            error: "You cannot delete somebody's comment"
+          });
+        }
       }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
