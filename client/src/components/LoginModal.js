@@ -8,12 +8,11 @@ function Login(props) {
   }
   return (
     <Modal show={props.show} onHide={props.handleClose} animation={true}>
+      <Modal.Header closeButton style={{ fontSize: 30 }} >
+        Login to Online Store
+      </Modal.Header>
       <Card>
         <Card.Body>
-          <Card.Title style={{ fontSize: 30 }}>
-            Login to Online Store
-          </Card.Title>
-          <hr />
           <Card.Text>
             Welcome to Online Store <br/>
             <ul>
