@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, Card } from "react-bootstrap";
 import "../styles/login.css";
 
-function Login(props) {
+const Login = props => {
   const redirect = () => {
     window.location.href = "http://localhost:5000/auth/login";
   }

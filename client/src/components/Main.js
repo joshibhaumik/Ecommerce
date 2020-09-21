@@ -1,23 +1,24 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import Header from './Header';
+import Layout from "./Layout";
+import Store from "./Store";
+import CreateStore from "./CreateStore";
+import RenderItem from "./RenderItem";
+import CreateItem from "./CreateItem";
+import Profile from "./Profile";
 
-function Main() {
-  const [auth, toggleAuth] = useState(true);
-
+const Main = () => {
   return (
     <Router>
       <Switch>
-        {auth ? (
-          <>
-            <Header />
-          </>
-        ) : (
-          <>
-            <div>this is another div</div>
-          </>
-        )}
+        <Layout>
+          <Route path="/store" component={Store} />
+          <Route path="/store/create" component={CreateStore} />
+          <Route path="/item/:itemId" component={RenderItem} />
+          <Route path="/item/create" component={CreateItem} />
+          <Route path="/user/:userId" component={Profile} />
+        </Layout>
       </Switch>
     </Router>
   );

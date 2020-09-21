@@ -5,7 +5,7 @@ import "../styles/App.css";
 import Main from "./Main";
 import store from "../store";
 
-function App() {
+const App = () => {
   return (
     <Provider store={store}>
       <Main />

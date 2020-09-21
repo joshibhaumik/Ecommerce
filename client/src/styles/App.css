@@ -1,0 +1,9 @@
+.online-store-container {
+    margin: 75px 20px 0px 20px;
+}
+
+.center-it {
+    position: absolute;
+    left:50%;
+    transform: translate(-50%, 0);
+}
