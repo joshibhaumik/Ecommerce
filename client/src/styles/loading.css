@@ -1,0 +1,33 @@
+.loading-container {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+}
+
+.roller {
+  top: 25%;
+  display: inline-block;
+  width: 75px;
+  height: 75px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1.5s infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: translate(-50%, 0%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, 0%) rotate(360deg);
+  }
+}
+
+.loading-content {
+  color: white;
+  font-size: 25px;
+  top: calc(25% + 90px);
+}

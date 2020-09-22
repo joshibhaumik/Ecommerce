@@ -1,9 +1,77 @@
 .online-store-container {
-    margin: 75px 20px 0px 20px;
+  margin: 75px 20px 0px 20px;
 }
 
 .center-it {
-    position: absolute;
-    left:50%;
-    transform: translate(-50%, 0);
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.input-field-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.floating-label {
+  position: absolute;
+  top: 0;
+  padding: 7px 0 0 13px;
+  transition: all 200ms;
+  opacity: 0.5;
+}
+
+.input-field:focus + .floating-label,
+.input-field:valid + .floating-label {
+  font-size: 75%;
+  transform: translate3d(0, -100%, 0);
+  opacity: 1;
+}
+
+.input-field {
+  border: none;
+  border-bottom: 2px solid black;
+  border-radius: 0;
+}
+
+.input-field:focus {
+  border-bottom: 2px solid black;
+}
+
+.btn-general, .btn-general-lg {
+  background-color: #00d69a;
+  color: white;
+  border-radius: 10px;
+  outline: none;
+  border: none;
+}
+
+.btn-general {
+  font-size: 17px;
+}
+
+.btn-general-lg {
+  font-size: 22px;
+  padding-left: 17.5px;
+  padding-right: 20px;
+  padding-bottom: 10px;
+}
+
+.btn-general:hover, .btn-general-lg:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.circle-button {
+  position: fixed;
+  z-index: 5;
+  right: 0;
+  bottom: 0;
+  color: white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  outline: none;
+  border: none;
+  transform: translate(-100%, -100%);
+  font-size: 25px;
 }

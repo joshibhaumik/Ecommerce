@@ -10,6 +10,18 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 /*
+  @route /api/current_user/
+  @desc Get the current logged in user
+*/
+router.get("/current_user", auth.verifyUser, (req, res, next) => {
+  res.json({
+    status:true,
+    payload: req.user,
+    error:""
+  });
+})
+
+/*
   @route /api/users/
   @desc CRUD operations for all the users
 */

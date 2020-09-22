@@ -1,49 +1,31 @@
 .create-store-container {
-    text-align: center;
-    top:200px;
+  text-align: center;
+  top: 200px;
 }
 
 .create-store-form-container {
-    width: 700px;
-    height: auto;
-    border: 2px solid grey;
-    padding:10px;
+  width: 700px;
+  height: auto;
+  padding: 10px;
 }
 
-.create-store-button {
-    background-color: #00d69a;
-    color: white;
-    font-size: 22px;
-    border-radius: 10px;
-    padding-left: 17.5px;
-    padding-right: 20px;
-    padding-bottom: 10px;
-    outline: none;
-    border: none;
+.store-contains {
+  padding: 10px;
 }
 
 .create-store-button:hover {
-    color: rgba(255, 255, 255, 0.85);
-    background-color: #00d699f1;
-}
-
-.create-item-button {
-    position: fixed;
-    z-index: 5;
-    right: 0;
-    bottom: 0;
-    background-color: red;
-    color: white;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    outline: none;
-    border:none;
-    transform: translate(-100%, -100%);
-    font-size: 25px;
+  color: rgba(255, 255, 255, 0.85);
+  background-color: #00d699f1;
 }
 
 .create-item-button:hover {
-    color: rgba(255, 255, 255, 0.8);
-    
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.edit-store-button {
+  position: fixed;
+  right:0px;
+  top:75px;
+  transform: translate(-60px, 0%);
+  z-index: 5;
 }

@@ -1,0 +1,3 @@
+export const USER_ISLOADING = "USER_ISLOADING";
+export const USER_ISLOADED = "USER_ISLOADED";
+export const USER_ERROR = "USER_ERROR";

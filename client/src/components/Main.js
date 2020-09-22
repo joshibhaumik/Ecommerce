@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import Layout from "./Layout";
@@ -13,11 +13,11 @@ const Main = () => {
     <Router>
       <Switch>
         <Layout>
-          <Route path="/store" component={Store} />
-          <Route path="/store/create" component={CreateStore} />
-          <Route path="/item/:itemId" component={RenderItem} />
-          <Route path="/item/create" component={CreateItem} />
-          <Route path="/user/:userId" component={Profile} />
+          <Route exact path="/store" component={Store} />
+          <Route exact path="/store/create" component={CreateStore} />
+          <Route exact path="/items/create" component={CreateItem} />
+          <Route exact path="/item/:itemId" component={RenderItem} />
+          <Route exact path="/user/:userId" component={Profile} />
         </Layout>
       </Switch>
     </Router>
