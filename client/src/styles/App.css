@@ -38,8 +38,16 @@
   border-bottom: 2px solid black;
 }
 
-.btn-general, .btn-general-lg {
+.store-gn-color, .btn-general, .btn-general-lg {
   background-color: #00d69a;
+  color: white;
+}
+
+.store-gn-color:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-general, .btn-general-lg {
   color: white;
   border-radius: 10px;
   outline: none;

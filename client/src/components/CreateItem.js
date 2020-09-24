@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 
 const CreateItem = props => {
-    const [name, setName] = useState("");
+    let { state } = props.location;
+    if(state === undefined) {
+        state = {
+            name:"",
+        }
+    }
+    const [name, setName] = useState(state.name);
 
     const handleSubmit = e => {
         e.preventDefault();
     }
 
+
     return(
         <div className="center-it create-item-container">
-            <h3>Create Item?</h3>
+            <h3>{name || "no name"}</h3>
             <form method="POST" onSubmit={handleSubmit}>
                 
             </form>

@@ -1,8 +1,47 @@
-.create-item-container {
-
+.render-items-container {
+    width: 750px;
+    height: auto;
 }
 
-.render-items-container {
+.edit-icon {
+    position: relative;
+    font-size: 20px;
+    color: white;
+    z-index: 3;
+    top: 20px;
+    left: 150px;
+    width: 35px;
+    height: 35px;
+    padding-top: 6px;
+    padding-left: 7.5px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.render-an-item-image, .details-of-the-item {
+    width: 225px;
+}
+
+.render-an-item-image {
+    height: 250px;
+    border-radius: 10px;
+}
+
+.details-of-the-item {
+    padding: 0px 12px;
+    width: 225px;
+}
+
+.add-to-cart-button {
+    padding: 3px 10px;
+    font-size: 14px;
+}
+
+.add-to-cart-button:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.render-cart-item {
     width: 750px;
     height: auto;
 }

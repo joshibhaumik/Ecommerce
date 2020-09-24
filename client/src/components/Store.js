@@ -24,7 +24,7 @@ const Store = props => {
                 <button onClick={handleEdit} className="btn btn-general edit-store-button">Edit Store</button>
             </div>
             <div className="store-contains">
-                <Items payload={[]} />
+                <Items payload={[]} canEdit={true} />
                 <button title="Create Item" className="btn btn-danger circle-button">
                     <i className="fas fa-plus"></i>
                 </button>

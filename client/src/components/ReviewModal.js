@@ -4,7 +4,7 @@ import { Modal } from "react-bootstrap";
 const ReviewModal = props => {
   const [comment, setComment] = useState(props.comment_ || "");
   const [commentError, setCommentError] = useState("");
-  const [rating, setRating] = useState(props.rating_ || "");
+  const [rating, setRating] = useState(props.rating_ || 1);
 
   const validateComment = () => {
     if (comment === "") {
@@ -64,7 +64,7 @@ const ReviewModal = props => {
                   value={rating}
                   onChange={e => setRating(e.target.value)}
                 >
-                  {[0, 1, 2, 3, 4, 5].map(e => (
+                  {[1, 2, 3, 4, 5].map(e => (
                     <option value={e}>{e}</option>
                   ))}
                 </select>
