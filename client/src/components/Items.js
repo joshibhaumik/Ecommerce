@@ -31,9 +31,9 @@ const Items = props => {
           />
         </div>
         <div className="details-of-the-item">
-          <div style={{ fontSize: 20 }}>
+          <div className="my-2" style={{ fontSize: 18 }}>
             <Link to={"/item/" + details.itemId}>{details.name}</Link>
-            <span className="float-right">{details.rating || "unrated"}</span>
+            <kbd className="float-right">{details.rating || "unrated"}</kbd>
           </div>
           <div className="mt-1">
             <span style={{ fontSize: 18 }}>Price: ${details.price}</span>
@@ -47,7 +47,7 @@ const Items = props => {
   );
 
   return (
-    <div className="row ml-5">
+    <div className={props.forCart?"":"row ml-5"}>
       {props.payload.map((item, i) =>
         props.forCart ? (
           <RenderAnItemForCart key={i} details={item} />
@@ -65,7 +65,7 @@ const RenderAnItemForCart = props => {
   const { details } = props;
   const [quantity, setQuantity] = useState(1);
   return (
-    <div className="my-3 row center-it render-cart-item">
+    <div style={{position:'relative'}} className="my-4 row center-it render-cart-item">
       <div className="col-sm-3">
         <img
           alt="Cart Item"
