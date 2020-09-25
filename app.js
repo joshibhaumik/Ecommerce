@@ -17,7 +17,8 @@ const authRouter = require("./routes/authentication");
 const storeRouter = require("./routes/store");
 const usersRouter = require("./routes/users");
 const itemsRouter = require("./routes/items");
-const commentRouter = require("./routes/comments");
+const reviewRouter = require("./routes/review");
+const notificationRouter = require("./routes/notifications");
 
 dotenv.config({ path: "config.env" });
 
@@ -46,7 +47,8 @@ app.use(passport.session());
 app.use("/api/users", usersRouter);
 app.use("/api/store", storeRouter);
 app.use("/api/items", itemsRouter);
-app.use("/api/comments", commentRouter);
+app.use("/api/reviews", reviewRouter);
+app.use("/api/notifications", notificationRouter);
 app.use("/auth", authRouter);
 app.use("/", indexRouter);
 

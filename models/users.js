@@ -1,15 +1,10 @@
 const mongoose = require("mongoose");
-const Items = require("./Items").schema;
 
 const userSchema = new mongoose.Schema(
   {
     googleId: {
       type: String,
       required: true
-    },
-    email: {
-      type:String,
-      required:true
     },
     displayName: {
       type: String,
@@ -23,6 +18,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    image: {
+      type: String,
+      required: true
+    },
     isAdmin: {
       type: Boolean,
       default: false
@@ -31,16 +30,18 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store"
     },
+    notifications: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Notification'
+      }
+    ],
     cart: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Item"
       }
-    ],
-    image: {
-      type: String,
-      required: true
-    }
+    ]
   },
   {
     timestamps: true

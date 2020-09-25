@@ -3,7 +3,7 @@ const bodyparser = require("body-parser");
 const Store = require("../models/Stores");
 const User = require("../models/Users");
 const Items = require("../models/Items");
-const Comments = require("../models/Comments");
+const Reviews = require("../models/Reviews");
 const auth = require("../authenticate");
 
 const router = express.Router();
@@ -63,7 +63,7 @@ router
     try {
       const stores = await Store.remove({});
       const items = await Items.remove({});
-      const comments = await Comments.remove({});
+      const reviews = await Reviews.remove({});
       res.json({ status: true, payload: stores, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
@@ -164,7 +164,7 @@ router
           const items_ = await Items.find({ store: store._id });
           if (items_.length !== 0) {
             for (let item of items_) {
-              const comment = await Comments.remove({ item: item._id });
+              const reviews = await Reviews.remove({ item: item._id });
             }
             const items = await Items.remove({ store: store._id });
           }

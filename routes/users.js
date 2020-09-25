@@ -3,14 +3,15 @@ const bodyParser = require("body-parser");
 const User = require("../models/Users");
 const Items = require("../models/Items");
 const Store = require("../models/Stores");
-const Comments = require("../models/Comments");
+const Reviews = require("../models/Reviews");
+const Notification = require("../models/Notifications");
 const auth = require("../authenticate");
 
 const router = express.Router();
 router.use(bodyParser.json());
 
 /*
-  @route /api/current_user/
+  @route /api/users/current_user/
   @desc Get the current logged in user
 */
 router.get("/current_user", auth.verifyUser, (req, res, next) => {
@@ -64,7 +65,7 @@ router
       let users = await User.remove({});
       let stores = await Store.remove({});
       let items = await Items.remove({});
-      let comments = await Comments.remove({});
+      let reviews = await Reviews.remove({});
       res.json({ status: true, payload: users, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
@@ -129,7 +130,7 @@ router
             const items_ = await Items.find({ store: store._id });
             if (items_.length !== 0) {
               for (let item of items_) {
-                const comments = await Comments.remove({ item: item._id });
+                const reviews = await Reviews.remove({ item: item._id });
               }
               const items = await Items.remove({ store: store._id });
             }

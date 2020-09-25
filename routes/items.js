@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const Items = require("../models/Items");
 const Store = require("../models/Stores");
-const Comments = require("../models/Comments");
+const Reviews = require("../models/Reviews");
 const auth = require("../authenticate");
 
 const router = express.Router();
@@ -69,7 +69,7 @@ router
     res.statusCode = 200;
     try {
       let items = await Items.remove({});
-      let comments = await Comments.remove({});
+      let reviews = await Reviews.remove({});
       res.json({ status: true, payload: items, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
@@ -168,7 +168,7 @@ router
               error: "Item does not exists"
             });
           } else {
-            const comments = await Comments.remove({ item: item._id });
+            const reviews = await Reviews.remove({ item: item._id });
             store.items.pull(String(item._id));
             const succ = await store.save();
             res.json({ status: true, payload: item, error: "" });

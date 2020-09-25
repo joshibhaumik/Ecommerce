@@ -14,7 +14,6 @@ exports.validateGoogle = passport => {
       async (accessToken, refreshToken, profile, next) => {
         const newUser = {
           googleId: profile.id,
-          email: profile.emails,
           displayName: profile.displayName,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,

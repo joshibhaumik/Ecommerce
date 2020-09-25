@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const Comments = require("../models/Comments");
+const Reviews = require("../models/Reviews");
 const Items = require("../models/Items");
 const User = require("../models/Users");
 const auth = require("../authenticate");
@@ -9,8 +9,8 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 /*
-  @route /api/comments/
-  @desc CRUD operations for all the comments
+  @route /api/reviews/
+  @desc CRUD operations for all the reviews
 */
 router
   .route("/")
@@ -18,8 +18,8 @@ router
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let comments = await Comments.find({});
-      res.json({ status: true, payload: comments, error: "" });
+      let reviews = await Reviews.find({});
+      res.json({ status: true, payload: reviews, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
@@ -46,28 +46,28 @@ router
               error: "Item does not exists"
             });
           } else {
-            const comment_ = await Comments.find({ user: req.body.user }).where(
+            const review_ = await Reviews.find({ user: req.body.user }).where(
               "item",
               req.body.item
             );
-            if (comment_.length > 0) {
+            if (review_.length > 0) {
               res.json({
                 status: false,
                 payload: [],
                 error: "You're not allowed to rate an item more then once"
               });
             } else {
-              const comment = await Comments.create(req.body);
-              item.comments.push(comment);
+              const review = await Reviews.create(req.body);
+              item.reviews.push(review);
               if (item.rating === -1) {
-                item.rating = comment.rating;
+                item.rating = review.rating;
               } else {
                 item.rating =
-                  (item.rating * (item.comments.length - 1) + comment.rating) /
-                  item.comments.length;
+                  (item.rating * (item.reviews.length - 1) + review.rating) /
+                  item.reviews.length;
               }
               const succ = await item.save();
-              res.json({ status: true, payload: comment, error: "" });
+              res.json({ status: true, payload: review, error: "" });
             }
           }
         }
@@ -75,7 +75,7 @@ router
         res.json({
           status: false,
           payload: [],
-          error: "You cannot add comment on other people's behalf"
+          error: "You cannot add review on other people's behalf"
         });
       }
     } catch (error) {
@@ -96,8 +96,8 @@ router
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let comments = await Comments.remove({});
-      res.json({ status: true, payload: comments, error: "" });
+      let reviews = await Reviews.remove({});
+      res.json({ status: true, payload: reviews, error: "" });
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
       next(error);
@@ -105,24 +105,24 @@ router
   });
 
 /*
-  @route /api/comments/commentId
-  @desc CRUD operations for a comment
+  @route /api/reviews/reviewId
+  @desc CRUD operations for a review
 */
 router
-  .route("/:commentId")
+  .route("/:reviewId")
   .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let comment = await Comments.findById(req.params.commentId);
-      if (comment === null) {
+      let review = await Reviews.findById(req.params.reviewId);
+      if (review === null) {
         res.json({
           status: false,
           payload: [],
-          error: "Comment does not exists"
+          error: "Review does not exists"
         });
       } else {
-        res.json({ status: true, payload: comment, error: "" });
+        res.json({ status: true, payload: review, error: "" });
       }
     } catch (error) {
       res.json({ status: false, payload: {}, error: error });
@@ -158,32 +158,32 @@ router
             error: "Item does not exists"
           });
         } else {
-          const comment = await Comments.findByIdAndUpdate(
-            req.params.commentId,
+          const review = await Reviews.findByIdAndUpdate(
+            req.params.reviewId,
             { $set: req.body },
             { new: true }
           );
-          if (comment === null) {
+          if (review === null) {
             res.json({
               status: false,
               payload: [],
-              error: "Comment does not exists"
+              error: "Review does not exists"
             });
           } else {
             item.rating =
-              (item.rating * item.comments.length -
-                comment_.rating +
-                comment.rating) /
-              item.comments.length;
+              (item.rating * item.reviews.length -
+                review_.rating +
+                review.rating) /
+              item.reviews.length;
             const succ = await item.save();
-            res.json({ status: true, payload: comment, error: "" });
+            res.json({ status: true, payload: review, error: "" });
           }
         }
       } else {
         res.json({
           status: false,
           payload: [],
-          error: "You cannot modify comment on other people's behalf"
+          error: "You cannot modify review on other people's behalf"
         });
       }
     } catch (error) {
@@ -195,27 +195,27 @@ router
     res.setHeader("Content-Type", "application/json");
     res.statusCode = 200;
     try {
-      let comment = await Comments.findByIdAndRemove(req.params.commentId);
-      if (comment === null) {
+      let review = await Reviews.findByIdAndRemove(req.params.reviewId);
+      if (review === null) {
         res.json({
           status: false,
           payload: [],
-          error: "Comment does not exists"
+          error: "Review does not exists"
         });
       } else {
-        if (String(req.user._id) === String(comment.user)) {
-          let item = await Items.findById(comment.item);
+        if (String(req.user._id) === String(review.user)) {
+          let item = await Items.findById(review.item);
           item.rating =
-            (item.rating * item.comments.length - comment.rating) /
-            (item.comments.length - 1);
-          item.comments.pull(String(comment._id));
+            (item.rating * item.reviews.length - review.rating) /
+            (item.reviews.length - 1);
+          item.reviews.pull(String(review._id));
           let succ = await item.save();
-          res.json({ status: true, payload: comment, error: "" });
+          res.json({ status: true, payload: review, error: "" });
         } else {
           res.json({
             status: false,
             payload: [],
-            error: "You cannot delete somebody's comment"
+            error: "You cannot delete somebody's review"
           });
         }
       }
