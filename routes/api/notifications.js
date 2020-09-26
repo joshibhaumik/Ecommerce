@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const auth = require("../authenticate");
-const Notifications = require("../models/Notifications");
-const Users = require("../models/Users");
+const auth = require("../../authenticate");
+const Notifications = require("../../models/Notifications");
+const Users = require("../../models/Users");
 
 const router = express.Router();
 router.use(bodyParser.json());

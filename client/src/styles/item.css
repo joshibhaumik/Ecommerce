@@ -9,7 +9,7 @@
     color: white;
     z-index: 3;
     top: 20px;
-    left: 150px;
+    left: 200px;
     width: 35px;
     height: 35px;
     padding-top: 6px;
@@ -18,18 +18,10 @@
     cursor: pointer;
 }
 
-.render-an-item-image, .details-of-the-item {
-    width: 225px;
-}
-
 .render-an-item-image {
-    height: 250px;
-    border-radius: 10px;
-}
-
-.details-of-the-item {
-    padding: 0px 12px;
-    width: 225px;
+    width: 275px;
+    height: 275px;
+    border: none;
 }
 
 .add-to-cart-button {
@@ -44,4 +36,8 @@
 .render-cart-item {
     width: 750px;
     height: auto;
+}
+
+.render-an-item-card {
+    width: calc(275px + 1.5px);
 }

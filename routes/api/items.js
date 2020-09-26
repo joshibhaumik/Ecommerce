@@ -1,9 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const Items = require("../models/Items");
-const Store = require("../models/Stores");
-const Reviews = require("../models/Reviews");
-const auth = require("../authenticate");
+const Items = require("../../models/Items");
+const Store = require("../../models/Stores");
+const Reviews = require("../../models/Reviews");
+const auth = require("../../authenticate");
 
 const router = express.Router();
 router.use(bodyParser.json());

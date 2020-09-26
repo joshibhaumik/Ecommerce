@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Card } from "react-bootstrap";
 import "../styles/item.css";
 import { withRouter, Link } from "react-router-dom";
 
@@ -15,34 +16,26 @@ const Items = props => {
   };
 
   const RenderAnItem = details => (
-    <div key={details.id} className="my-4 col-sm-3">
+    <div className="my-4 col-sm-3">
       {props.canEdit && (
         <i
           className="fas fa-edit edit-icon store-gn-color"
           onClick={() => editItem(details)}
         ></i>
       )}
-      <div>
-        <div>
-          <img
-            className="render-an-item-image"
-            src={details.image}
-            alt="Item"
-          />
-        </div>
-        <div className="details-of-the-item">
-          <div className="my-2" style={{ fontSize: 18 }}>
+      <Card className="render-an-item-card">
+        <Card.Img className="render-an-item-image" variant="top" src={details.image} />
+        <Card.Body>
+          <Card.Title>
             <Link to={"/item/" + details.itemId}>{details.name}</Link>
             <kbd className="float-right">{details.rating || "unrated"}</kbd>
-          </div>
-          <div className="mt-1">
+          </Card.Title>
+          <div className="mt-3">
             <span style={{ fontSize: 18 }}>Price: ${details.price}</span>
-            <button className="btn float-right shadow-none store-gn-color add-to-cart-button">
-              Add To Cart
-            </button>
-          </div>
+            <button className="btn float-right shadow-none store-gn-color add-to-cart-button">Add To Cart</button>
         </div>
-      </div>
+        </Card.Body>
+      </Card>
     </div>
   );
 

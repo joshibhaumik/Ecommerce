@@ -2,7 +2,6 @@ const createError = require("http-errors");
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
-const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const dotenv = require("dotenv");
 const passport = require("passport");
@@ -12,13 +11,9 @@ const MongoStore = require("connect-mongo")(session);
 const connect = require("./connectToDB");
 const auth = require("./authenticate");
 
+const apiRouter = require("./routes/api/index");
 const indexRouter = require("./routes/index");
 const authRouter = require("./routes/authentication");
-const storeRouter = require("./routes/store");
-const usersRouter = require("./routes/users");
-const itemsRouter = require("./routes/items");
-const reviewRouter = require("./routes/review");
-const notificationRouter = require("./routes/notifications");
 
 dotenv.config({ path: "config.env" });
 
@@ -32,7 +27,6 @@ const app = express();
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser("12345-67890-09876-54321"));
 
 app.use(session({
   secret: 'online store',
@@ -44,11 +38,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api/users", usersRouter);
-app.use("/api/store", storeRouter);
-app.use("/api/items", itemsRouter);
-app.use("/api/reviews", reviewRouter);
-app.use("/api/notifications", notificationRouter);
+app.use("/api", apiRouter);
 app.use("/auth", authRouter);
 app.use("/", indexRouter);
 
