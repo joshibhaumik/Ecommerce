@@ -14,12 +14,21 @@ router.use(bodyParser.json());
   @route /api/users/current_user/
   @desc Get the current logged in user
 */
-router.get("/current_user", auth.verifyUser, (req, res, next) => {
-  res.json({
-    status:true,
-    payload: req.user,
-    error:""
-  });
+router.get("/current_user", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  if(req.user) {
+    res.status(200).json({
+      status:true,
+      payload: req.user,
+      error:""
+    });
+  } else {
+    res.status(403).json({
+      status:false,
+      payload:[],
+      error:""
+    });
+  }
 })
 
 /*

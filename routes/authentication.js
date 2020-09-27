@@ -17,7 +17,7 @@ router.get(
   "/google",
   passport.authenticate("google", { failureRedirect: "/failure" }),
   (req, res, next) => {
-    res.redirect(301, "/api/users/current_user");
+    res.status(301).redirect("http://localhost:3000/");
   }
 );
 

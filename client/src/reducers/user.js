@@ -1,7 +1,8 @@
-import { USER_ISLOADED, USER_ISLOADING, USER_ERROR } from "../actions/types";
+import { USER_ISLOADED, USER_ISLOADING, USER_ERROR, USER_LOGOUT } from "../actions/types";
 
 const initialState = {
-    loading:false,
+    isAuthenticated: false,
+    isLoading:false,
     user:{},
     error: ""
 };
@@ -11,6 +12,7 @@ export default function(state = initialState, action) {
         case USER_ISLOADED:
             return {
                 ...state,
+                auth: true,
                 loading:false,
                 user: action.payload
             }
@@ -23,6 +25,10 @@ export default function(state = initialState, action) {
             return {
                 ...state,
                 error: action.payload
+            }
+        case USER_LOGOUT:
+            return {
+                ...state
             }
         default:
             return state;

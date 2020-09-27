@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { connect } from "react-redux";
 
 import Layout from "./Layout";
 import Store from "./Store";
@@ -10,7 +11,15 @@ import Profile from "./Profile";
 import Cart from "./Cart";
 import Home from "./Home";
 
-const Main = () => {
+import { loadCurrentUser } from "../actions/userActions";
+
+const Main = props => {
+  
+  useEffect(()=> {
+    document.title = "Welcome to the Online Store";
+    props.loadCurrentUser();
+  }, []);
+  
   return (
     <Router>
       <Switch>
@@ -28,4 +37,16 @@ const Main = () => {
   );
 };
 
-export default Main;
+const mapStateToProps = state => {
+  return {
+    user: state.user.user,
+    isAuthenticated: state.user.isAuthenticated,
+    isLoading: state.user.isLoading
+  }
+}
+
+const mapDispatchToProps = (dispatch) => ({
+  loadCurrentUser: () => dispatch(loadCurrentUser()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
