@@ -10,6 +10,7 @@ import CreateItem from "./CreateItem";
 import Profile from "./Profile";
 import Cart from "./Cart";
 import Home from "./Home";
+import Notifications from "./Notifications";
 
 import { loadCurrentUser } from "../actions/userActions";
 
@@ -25,6 +26,7 @@ const Main = props => {
       <Switch>
         <Layout>
           <Route exact path="/" component={Home} />
+          <Route exact path="/notifications" component={Notifications} />
           <Route exact path="/cart" component={Cart} />
           <Route exact path="/store" component={Store} />
           <Route exact path="/store/create" component={CreateStore} />

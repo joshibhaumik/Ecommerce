@@ -22,10 +22,9 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-.edit-store-button {
-  position: fixed;
-  right:0px;
+.edit-store-button, .notification-store-button {
+  position: absolute;
+  right:0px;  
   top:75px;
   transform: translate(-60px, 0%);
-  z-index: 5;
 }
