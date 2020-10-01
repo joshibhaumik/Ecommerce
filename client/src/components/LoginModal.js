@@ -4,6 +4,7 @@ import "../styles/login.css";
 
 const Login = props => {
   const redirect = () => {
+    window.localStorage.setItem("atLogin",window.location.href);
     window.location.href = "http://localhost:5000/auth/login";
   }
   return (

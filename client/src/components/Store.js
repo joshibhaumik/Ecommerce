@@ -4,6 +4,7 @@ import Items from "./Items";
 
 const Store = props => {
   const [created, toggleCreated] = useState(true);
+  const [auth, toggleAuth] = useState(true);
 
   const handleEdit = () => {
     props.history.push({
@@ -20,7 +21,7 @@ const Store = props => {
       <div>
         <h3>Store Name</h3>
       </div>
-      <div>
+      {auth && <div>
         <button
           title="Your Notifications"
           style={{ right: window.innerWidth <= 800 ? 50 : 150 }}
@@ -38,12 +39,12 @@ const Store = props => {
           <i className="fas fa-marker"></i>{" "}
           {window.innerWidth <= 800 ? "" : "Edit Store"}
         </button>
-      </div>
+      </div>}
       <div className="store-contains">
         <Items payload={[]} canEdit={true} />
-        <button title="Create Item" className="btn btn-danger circle-button">
+        {auth && <button title="Create Item" className="btn btn-danger circle-button">
           <i className="fas fa-plus"></i>
-        </button>
+        </button>}
       </div>
     </div>
   );
@@ -55,7 +56,19 @@ const Store = props => {
     </div>
   );
 
-  return <div>{created ? createdStore() : createStore()}</div>;
+  const DoesNotExists = () => (
+    <div className="p-5">
+      <p className="text-muted" style={{fontSize:30}}>Store Does Not Exists</p>
+    </div>
+  );
+
+  if(created) {
+    return createdStore();
+  } else if(auth && !created) {
+    return createStore();
+  } else {
+    return DoesNotExists();
+  }
 };
 
 export default Store;

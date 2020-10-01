@@ -1,7 +1,9 @@
 .check-out-button {
-    position: fixed;
-    z-index: 5;
-    bottom: 0;
-    right: 0;
-    transform: translate(-100%, -60px);
+    position: relative;
+    width: auto;
+    height: 40px;
+}
+
+.amount {
+    font-size: 27px;
 }

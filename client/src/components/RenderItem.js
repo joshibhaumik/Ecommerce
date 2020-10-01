@@ -14,7 +14,7 @@ const RenderItem = props => {
   <td>
     <div>
       <Link to={"/user/"+review.userId}>{review.name}</Link>
-      <span className="ml-4" style={{fontSize:13,color:"grey"}}>{review.createdAt}</span>
+      <span className="ml-4 text-muted" style={{fontSize:13}}>{review.createdAt}</span>
     </div>
     <div>Rating: {review.rating}</div>
     <p>{review.comment}</p>
@@ -32,7 +32,7 @@ const RenderItem = props => {
             <img src={"https://picsum.photos/400"} alt="Item" />
           </div>
           <div className="offset-sm-1 col-sm-5">
-            <h3 style={{color:"grey"}} className="ml-2">{Capitalise(props.match.params.itemId)}</h3>
+            <h3 className="ml-2 text-muted">{Capitalise(props.match.params.itemId)}</h3>
             <table className="table">
               <tbody>
                 <tr>
@@ -42,10 +42,6 @@ const RenderItem = props => {
                 <tr>
                   <td>Quantities Available</td>
                   <td>20</td>
-                </tr>
-                <tr>
-                  <td>Description</td>
-                  <td>Ut eu lorem auctor, blandit magna a, ornare erat.</td>
                 </tr>
                 <tr>
                   <td>Category</td>
@@ -64,10 +60,16 @@ const RenderItem = props => {
           </div>
         </div>
         <div>
-          <h1 style={{color:"grey"}}>Reviews</h1>
+          <hr />
+            <h3 className="text-muted">Description</h3>
+            <p className="p-3">Ut eu lorem auctor, blandit magna a, ornare erat.</p>
+          <hr />
+        </div>
+        <div>
+          <h1 className="text-muted">Reviews</h1>
           <div className="mb-4 p-3">
             {[].length === 0 ? (
-              <p style={{color:"grey"}}>No reviews yet. Be the first to review it?</p>
+              <p className="text-muted">No reviews yet. Be the first to review it?</p>
             ) : (
               <table className="table table-striped">
                 <tbody>

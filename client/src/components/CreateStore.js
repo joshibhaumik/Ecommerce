@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { withRouter } from "react-router-dom";
 import "../styles/store.css";
 
 const CreateStore = props => {
@@ -73,7 +74,7 @@ const CreateStore = props => {
               <label htmlFor="description">Description</label>
               <textarea
                 style={{ resize: "none" }}
-                type="test"
+                type="text"
                 rows={6}
                 id="description"
                 value={storeDescription}
@@ -124,4 +125,4 @@ const CreateStore = props => {
   );
 };
 
-export default CreateStore;
+export default withRouter(CreateStore);

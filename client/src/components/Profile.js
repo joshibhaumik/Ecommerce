@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Profile = props => {
-  const [hasStore, toggleStore] = useState(false);
-  
+  const [hasStore, toggleStore] = useState(true);
+
   const deleteAccount = () => {
-    if(window.confirm("Are you sure you want to delete your account? All your Information will be deleted.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete your account? All your Information will be deleted."
+      )
+    ) {
       // proceed to delete his/her account
     }
-  }
+  };
 
   return (
     <div className="center-it profile-container">
@@ -21,23 +25,24 @@ const Profile = props => {
       </div>
       <br />
       <div>
-        <h3 className="text-center" style={{color:"grey"}}></h3><br />
+        <h3 className="text-muted text-center">{"Display Name"}</h3>
+        <br />
         <table class="table" style={{ width: 750 }}>
           <tbody>
             <tr>
               <td>First Name</td>
-              <td></td>
+              <td>Display</td>
             </tr>
             <tr>
               <td>Last Name</td>
-              <td></td>
+              <td>Name</td>
             </tr>
             <tr>
               <td>Store</td>
               <td>
                 {hasStore ? (
                   <div>
-                    Store Name. <Link to="/store/create">Edit Store</Link>
+                    Store. <Link to="/store/create">Edit Store</Link>
                   </div>
                 ) : (
                   <div>
@@ -47,22 +52,26 @@ const Profile = props => {
                 )}
               </td>
             </tr>
-            {hasStore && (
-              <tr>
-                <td>Store Description</td>
-                <td>
-                  {
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mattis nulla quis ex semper porta. Vivamus vel metus sed augue interdum lacinia. Cras diam sapien, elementum ac sodales sit amet, fermentum sed augue. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus dui risus, convallis in lorem sed, vulputate posuere quam. In maximus dolor quis lorem iaculis imperdiet. Donec mollis sapien nec arcu volutpat ultrices."
-                  }
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
-      <div className="mt-5">
-        <p style={{color:'grey'}}>Do you want to delete your account?</p>
-        <button className="btn btn-danger" onClick={deleteAccount}>Delete Your Account</button>
+      {hasStore && (
+        <div>
+          <hr />
+          <h3 className="text-muted">Store Description</h3>
+          <p className="p-3">
+            {
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mattis nulla quis ex semper porta. Vivamus vel metus sed augue interdum lacinia. Cras diam sapien, elementum ac sodales sit amet, fermentum sed augue. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus dui risus, convallis in lorem sed, vulputate posuere quam. In maximus dolor quis lorem iaculis imperdiet. Donec mollis sapien nec arcu volutpat ultrices."
+            }
+          </p>
+          <hr />
+        </div>
+      )}
+      <div className="my-5">
+        <p style={{ color: "grey" }}>Do you want to delete your account?</p>
+        <button className="btn btn-danger" onClick={deleteAccount}>
+          Delete Your Account
+        </button>
       </div>
     </div>
   );

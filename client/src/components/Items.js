@@ -5,7 +5,7 @@ import { withRouter, Link } from "react-router-dom";
 
 const Items = props => {
   if (props.payload === undefined || props.payload.length === 0) {
-    return <p style={{ color: "grey" }}>NO Items to display.</p>;
+    return <p style={{ color: "grey" }}>No Items to display.</p>;
   }
 
   const editItem = detail => {
@@ -68,7 +68,7 @@ const RenderAnItemForCart = props => {
       </div>
       <div className="offset-sm-1 col-sm-8">
         <h3>
-          {details.name} <kbd style={{ fontSize: 15 }}>{details.rating}</kbd>
+          <Link to="/item/_id">{details.name}</Link> <kbd style={{ fontSize: 15 }}>{details.rating}</kbd>
         </h3>
         <table className="table">
           <tbody>
@@ -100,10 +100,6 @@ const RenderAnItemForCart = props => {
             <tr>
               <td>Category</td>
               <td>{details.category}</td>
-            </tr>
-            <tr>
-              <td>Description</td>
-              <td>{details.description}</td>
             </tr>
           </tbody>
         </table>

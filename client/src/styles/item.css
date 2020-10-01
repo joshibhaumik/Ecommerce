@@ -3,6 +3,11 @@
     height: auto;
 }
 
+.create-item-container {
+    width: 750px;
+    height: auto;
+}
+
 .edit-icon {
     position: relative;
     font-size: 20px;
