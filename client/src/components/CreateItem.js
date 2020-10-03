@@ -1,42 +1,150 @@
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import { withRouter } from "react-router-dom";
+import axios from "axios";
+
+const initialState = {
+  name: "",
+  price: "",
+  quantity: 0,
+  category: "fruits",
+  image: "",
+  description: "",
+  nameError: "",
+  priceError: "",
+  quantityError: "",
+  descriptionError: "",
+  imageError: "",
+  valid: false,
+  imageLoading: "",
+  imageName: "",
+  error: "",
+  toggleeError: false,
+  checkBox: false
+};
+
+const ItemCreationReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "overwrite":
+      return {
+        ...state,
+        ...[action.details]
+      };
+    case "write":
+      return {
+        ...state,
+        [action.key]: action.value,
+        [String(action.key) + "Error"]: ""
+      };
+    case "error":
+      return {
+        ...state,
+        [action.key]: action.value
+      };
+    case "imageName":
+      return {
+        ...state,
+        imageName: action.value
+      };
+    case "check":
+      return {
+        ...state,
+        checkBox: !state.checkBox,
+        toggleeError: ""
+      };
+    default:
+      return state;
+  }
+};
 
 const CreateItem = props => {
-  let state = props.location.state;
-  if (state === undefined) {
-    state = {
-      name: "",
-      price: "",
-      quantity: 0,
-      category: "fruits",
-      image: "",
-      description: ""
-    };
+  let details = props.location.state;
+  const [state, dispatch] = useReducer(ItemCreationReducer, initialState);
+  if (details !== undefined) {
+    dispatch({ type: "overwrite", details });
   }
-  const [itemName, setItemName] = useState(state.name);
-  const [itemNameError, setItemNameError] = useState("");
-  const [itemPrice, setItemPrice] = useState(state.price);
-  const [itemPriceError, setItemPriceError] = useState("");
-  const [itemQuantity, setItemQuantity] = useState(state.quantity);
-  const [itemQuantityError, setItemQuantityError] = useState("");
-  const [itemDescription, setItemDescription] = useState(state.description);
-  const [itemDescriptionError, setItemDescriptionError] = useState("");
-  const [itemCategory, setItemCategory] = useState(state.category);
-  const [itemCategoryError, setItemCategoryError] = useState("");
-  const [itemImage, setitemImage] = useState(state.image);
-  const [itemImageError, setitemImageError] = useState("");
-  const [check, toggleCheck] = useState(false);
-  const [error, setError] = useState(false);
 
   const Capitalise = str => str.charAt(0).toUpperCase() + str.slice(1);
 
   const handleSubmit = e => {
     e.preventDefault();
+    if (state.image === "") {
+      dispatch({
+        type: "error",
+        key: "imageError",
+        value: "Please Upload an Image"
+      });
+    } else if (!state.checkBox) {
+      dispatch({
+        type: "error",
+        key: "toggleeError",
+        value: true
+      });
+    } else if (!state.valid) {
+      dispatch({
+        type: "error",
+        key: "error",
+        value: "Please resolve the errors to submit the form."
+      });
+    } else {
+      // upload the data and create or update an item
+    }
   };
 
-  const validateFile = fileName => {};
+  const uploadImageToCloud = async file => {
+    dispatch({
+      type: "error",
+      key: "imageLoading",
+      value: "Uploading..."
+    });
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "Instagram-Clone");
+      formData.append("cloud_name", "smilingcloud");
 
-  const validateInput = e => {};
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/smilingcloud/image/upload",
+        formData
+      );
+
+      dispatch({
+        type: "write",
+        key: "image",
+        value: response.data.url
+      });
+
+      dispatch({
+        type: "error",
+        key: "imageLoading",
+        value: "Image Uploaded Successfully"
+      });
+
+      dispatch({ type: "imageName", value: file.name });
+    } catch (error) {
+      dispatch({
+        type: "error",
+        key: "imageError",
+        value: "Error occured while uploading the image, please try again."
+      });
+    }
+  };
+
+  const handleInput = e =>
+    dispatch({
+      type: "write",
+      key: e.target.id,
+      value: e.target.value
+    });
+
+  const validateInput = e => {
+    if (!e.target.value) {
+      dispatch({
+        type: "error",
+        key: e.target.name,
+        value: "Enter the missing value"
+      });
+    }
+  };
 
   return (
     <div className="center-it create-item-container">
@@ -46,33 +154,29 @@ const CreateItem = props => {
             <div className="col-sm-12 form-group input-field-container">
               <input
                 type="text"
-                value={itemName}
+                value={state.name}
+                name="nameError"
                 id="name"
                 className="form-control input-field shadow-none"
-                onChange={e => {
-                  setItemName(e.target.value);
-                  setItemNameError("");
-                }}
+                onChange={handleInput}
                 onBlur={validateInput}
                 autoComplete="off"
               />
               <label className="floating-label" htmlFor="name">
                 Item Name
               </label>
-              {itemNameError && (
-                <small className="text-danger ml-3">{itemNameError}</small>
+              {state.nameError && (
+                <small className="text-danger ml-3">{state.nameError}</small>
               )}
             </div>
             <div className="col-sm-12 my-4 form-group input-field-container">
               <input
                 type="text"
-                value={itemPrice}
+                value={state.price}
+                name="priceError"
                 id="price"
                 className="form-control input-field shadow-none"
-                onChange={e => {
-                  setItemPrice(e.target.value);
-                  setItemPriceError("");
-                }}
+                onChange={handleInput}
                 onBlur={validateInput}
                 autoComplete="off"
               />
@@ -82,35 +186,35 @@ const CreateItem = props => {
                   *include your currency symbol
                 </small>
               </label>
-              {itemPriceError && (
-                <small className="text-danger ml-3">{itemPriceError}</small>
+              {state.priceError && (
+                <small className="text-danger ml-3">{state.priceError}</small>
               )}
             </div>
             <div className="col-sm-12 my-4 form-group input-field-container">
               <input
                 type="number"
-                value={itemQuantity}
+                value={state.quantity}
+                name="quantityError"
                 id="quantity"
                 className="form-control input-field shadow-none"
-                onChange={e => {
-                  setItemQuantity(e.target.value);
-                  setItemQuantityError("");
-                }}
+                onChange={handleInput}
                 onBlur={e =>
-                  (typeof e.target.value !== "number" &&
-                    setItemQuantityError("Quantity should be a number")) ||
-                  (e.target.value < 0 &&
-                    setItemQuantityError(
-                      "Quantities should be a positive number"
-                    ))
+                  (e.target.value < 0 || typeof e.target.value === "number") &&
+                  dispatch({
+                    type: "error",
+                    key: e.target.name,
+                    value: "Quantity should be a positive number"
+                  })
                 }
                 autoComplete="off"
               />
               <label className="floating-label" htmlFor="quantity">
                 Item Quantity
               </label>
-              {itemQuantityError && (
-                <small className="text-danger ml-3">{itemQuantityError}</small>
+              {state.quantityError && (
+                <small className="text-danger ml-3">
+                  {state.quantityError}
+                </small>
               )}
             </div>
             <div className="col-sm-12 my-4 form-group input-field-container">
@@ -118,8 +222,8 @@ const CreateItem = props => {
               <select
                 className="form-control input-field shadow-none"
                 id="category"
-                value={itemCategory}
-                onChange={e => setItemCategory(e.target.value)}
+                value={state.category}
+                onChange={handleInput}
               >
                 {[
                   "vegetables",
@@ -135,20 +239,21 @@ const CreateItem = props => {
             <div className="col-sm-12 my-4 form-group input-field-container">
               <div class="custom-file">
                 <input
-                  onChange={e => {
-                    validateFile(e.target.files[0].name);
-                    setitemImage(e.target.files[0].name);
-                  }}
+                  onChange={e => uploadImageToCloud(e.target.files[0])}
                   type="file"
+                  accept=".png,.jpg,.jpeg"
                   class="custom-file-input"
                   id="image"
                 />
                 <label class="custom-file-label" htmlFor="image">
-                  {itemImage || "Upload Item Image"}
+                  {state.imageName || "Upload Item Image"}
                 </label>
               </div>
-              {itemImageError && (
-                <small className="text-danger ml-3">{itemImageError}</small>
+              {state.imageError && (
+                <small className="text-danger ml-3">{state.imageError}</small>
+              )}
+              {state.imageLoading && (
+                <small className="ml-3 my-1">{state.imageLoading}</small>
               )}
             </div>
             <div className="mt-3 col-sm-12 form-group input-field-container">
@@ -158,47 +263,53 @@ const CreateItem = props => {
                 type="text"
                 rows={6}
                 id="description"
-                value={itemDescription}
+                name="descriptionError"
+                value={state.description}
                 className="form-control"
-                onChange={e => {
-                  setItemDescription(e.target.value);
-                  setItemDescriptionError("");
-                }}
+                onChange={handleInput}
                 onBlur={e => {
                   if (e.target.value === "") {
-                    setItemDescriptionError("Enter Description");
+                    dispatch({
+                      type: "error",
+                      key: e.target.name,
+                      value: "Enter Description"
+                    });
                   } else if (e.target.value.length > 1000) {
-                    setItemDescriptionError("Exceed Description Length");
+                    dispatch({
+                      type: "error",
+                      key: e.target.name,
+                      value: "Exceed Description Length"
+                    });
                   }
                 }}
                 autoComplete="off"
               />
-              {itemDescriptionError && (
+              {state.descriptionError && (
                 <small className="text-danger ml-3">
-                  {itemDescriptionError}
+                  {state.descriptionError}
                 </small>
               )}
             </div>
             <div className="mt-3 ml-3 col-sm-12 form-check">
               <input
                 type="checkbox"
-                checked={check}
+                checked={state.checkBox}
                 className="form-check-input"
                 id="TandC"
-                onChange={() => {
-                  toggleCheck(!check);
-                  setError(false);
-                }}
+                onChange={() => dispatch({ type: "check" })}
               />
               <label className="form-check-label" htmlFor="TandC">
                 Terms & Conditions
               </label>
               <br />
-              {error && (
+              {state.toggleeError && (
                 <small className="text-danger">
                   Please Check the Terms & Conditions checkbox
                 </small>
               )}
+            </div>
+            <div className="my-3" style={{ textAlign: "center" }}>
+              {state.error && <p className="text-danger">{state.error}</p>}
             </div>
             <div className="col-sm-12 mt-4" style={{ textAlign: "center" }}>
               <input
