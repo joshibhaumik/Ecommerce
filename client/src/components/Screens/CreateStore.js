@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
-import "../styles/store.css";
+import "../../styles/store.css";
 
 const CreateStore = props => {
   let details = props.location.state;
@@ -11,6 +11,8 @@ const CreateStore = props => {
   const [descriptionError, setDescriptionError] = useState("");
   const [check, toggleCheck] = useState(false);
   const [error, setError] = useState(false);
+
+  useEffect(()=> document.title = "Create your Store", []);
 
   const validateInput = () => {
     let error = "";

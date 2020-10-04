@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 
-import Items from "./Items";
-import "../styles/cart.css";
+import Items from "../layout/Items";
+import "../../styles/cart.css";
 
 const Cart = props => {
     const [showModal, toggleModal] = useState(false);
@@ -25,6 +25,8 @@ const Cart = props => {
         "image":"https://picsum.photos/500",
         "rating":4.5
     }]);
+
+    useEffect(()=> document.title = "Your Cart", []);
 
     const calculateAmount = () => {
         let amt = 0;

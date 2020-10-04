@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Route, withRouter } from "react-router-dom";
 
-import Login from "../LoginModal";
+import Login from "../Modals/LoginModal";
 
 const PrivateRoute = props => {
   const [auth, toggleAuth] = useState(true);

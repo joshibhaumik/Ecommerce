@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Card } from "react-bootstrap";
-import "../styles/item.css";
+import "../../styles/item.css";
 import { withRouter, Link } from "react-router-dom";
 
 const Items = props => {

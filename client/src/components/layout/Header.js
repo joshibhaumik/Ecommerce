@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Navbar, Nav } from "react-bootstrap";
 import { withRouter } from "react-router-dom";
 
-import Login from "./LoginModal";
+import Login from "../Modals/LoginModal";
 
 const Header = props => {
   const [auth, toggleAuth] = useState(false);

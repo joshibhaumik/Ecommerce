@@ -2,16 +2,16 @@ import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { connect } from "react-redux";
 
-import Layout from "./Layout";
-import Store from "./Store";
-import CreateStore from "./CreateStore";
-import RenderItem from "./RenderItem";
-import CreateItem from "./CreateItem";
-import Profile from "./Profile";
-import Cart from "./Cart";
-import Home from "./Home";
-import Notifications from "./Notifications";
-import DoesNotExists from "./DoesNotExists";
+import Layout from "./layout/Layout";
+import Store from "./Screens/Store";
+import CreateStore from "./Screens/CreateStore";
+import RenderItem from "./Screens/RenderItem";
+import CreateItem from "./Screens/CreateItem";
+import Profile from "./Screens/Profile";
+import Cart from "./Screens/Cart";
+import Home from "./Screens/Home";
+import Notifications from "./Screens/Notifications";
+import DoesNotExists from "./Screens/DoesNotExists";
 import PrivateRoute from "./features/PrivateRoute";
 
 import { loadCurrentUser } from "../actions/userActions";
@@ -19,7 +19,6 @@ import { loadCurrentUser } from "../actions/userActions";
 const Main = props => {
   
   useEffect(()=> {
-    document.title = "Welcome to the Online Store";
     props.loadCurrentUser();
   }, []);
   

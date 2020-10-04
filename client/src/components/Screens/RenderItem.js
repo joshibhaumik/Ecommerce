@@ -1,29 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../styles/item.css";
-import ReviewModal from './ReviewModal';
+import "../../styles/item.css";
+import ReviewModal from "../Modals/ReviewModal";
 
 const RenderItem = props => {
   const [show, toggleShow] = useState(false);
 
+  useEffect(() => (document.title = "Item"), []);
+
   const Capitalise = str => {
     return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+  };
 
-  const RenderReview = review => <tr>
-  <td>
-    <div>
-      <Link to={"/user/"+review.userId}>{review.name}</Link>
-      <span className="ml-4 text-muted" style={{fontSize:13}}>{review.createdAt}</span>
-    </div>
-    <div>Rating: {review.rating}</div>
-    <p>{review.comment}</p>
-  </td>
-</tr>
+  const RenderReview = review => (
+    <tr>
+      <td>
+        <div>
+          <Link to={"/user/" + review.userId}>{review.name}</Link>
+          <span className="ml-4 text-muted" style={{ fontSize: 13 }}>
+            {review.createdAt}
+          </span>
+        </div>
+        <div>Rating: {review.rating}</div>
+        <p>{review.comment}</p>
+      </td>
+    </tr>
+  );
 
   return (
     <>
-      <button title="Add A Review" className="btn btn-danger circle-button" onClick={()=>toggleShow(true)}>
+      <button
+        title="Add A Review"
+        className="btn btn-danger circle-button"
+        onClick={() => toggleShow(true)}
+      >
         <i className="fas fa-plus"></i>
       </button>
       <div className="mt-4 center-it render-items-container">
@@ -32,7 +42,9 @@ const RenderItem = props => {
             <img src={"https://picsum.photos/400"} alt="Item" />
           </div>
           <div className="offset-sm-1 col-sm-5">
-            <h3 className="ml-2 text-muted">{Capitalise(props.match.params.itemId)}</h3>
+            <h3 className="ml-2 text-muted">
+              {Capitalise(props.match.params.itemId)}
+            </h3>
             <table className="table">
               <tbody>
                 <tr>
@@ -53,7 +65,9 @@ const RenderItem = props => {
                 </tr>
                 <tr>
                   <td>Store</td>
-                  <td><Link to="/store/storeName">Visit Store?</Link></td>
+                  <td>
+                    <Link to="/store/storeName">Visit Store?</Link>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -61,26 +75,28 @@ const RenderItem = props => {
         </div>
         <div>
           <hr />
-            <h3 className="text-muted">Description</h3>
-            <p className="p-3">Ut eu lorem auctor, blandit magna a, ornare erat.</p>
+          <h3 className="text-muted">Description</h3>
+          <p className="p-3">
+            Ut eu lorem auctor, blandit magna a, ornare erat.
+          </p>
           <hr />
         </div>
         <div>
           <h1 className="text-muted">Reviews</h1>
           <div className="mb-4 p-3">
             {[].length === 0 ? (
-              <p className="text-muted">No reviews yet. Be the first to review it?</p>
+              <p className="text-muted">
+                No reviews yet. Be the first to review it?
+              </p>
             ) : (
               <table className="table table-striped">
-                <tbody>
-                  {[].map(e => RenderReview(e))}
-                </tbody>
+                <tbody>{[].map(e => RenderReview(e))}</tbody>
               </table>
             )}
           </div>
         </div>
       </div>
-      <ReviewModal show={show} handleClose={()=>toggleShow(false)} />
+      <ReviewModal show={show} handleClose={() => toggleShow(false)} />
     </>
   );
 };

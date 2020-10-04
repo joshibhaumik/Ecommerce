@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
 
@@ -14,7 +14,6 @@ const initialState = {
   quantityError: "",
   descriptionError: "",
   imageError: "",
-  valid: false,
   imageLoading: "",
   imageName: "",
   error: "",
@@ -63,10 +62,13 @@ const CreateItem = props => {
     dispatch({ type: "overwrite", details });
   }
 
+  useEffect(()=> document.title = "Create an Item for your Store", []);
+
   const Capitalise = str => str.charAt(0).toUpperCase() + str.slice(1);
 
   const handleSubmit = e => {
     e.preventDefault();
+    const { name, price, quantity, category, image, description } = state;
     if (state.image === "") {
       dispatch({
         type: "error",
@@ -79,14 +81,23 @@ const CreateItem = props => {
         key: "toggleeError",
         value: true
       });
-    } else if (!state.valid) {
+    } else if (name === "" || price === "" || quantity === "" || image === "" || description === "") {
       dispatch({
         type: "error",
         key: "error",
-        value: "Please resolve the errors to submit the form."
+        value: "Some fields are empty"
       });
     } else {
-      // upload the data and create or update an item
+      const formdata = new FormData();
+      formdata.append("name", name);
+      formdata.append("price", price);
+      formdata.append("quantity", quantity);
+      formdata.append("category", category);
+      formdata.append("image", image);
+      formdata.append("description", description);
+      formdata.append("store", "");
+      formdata.append("user", "");
+      // send the data to the server
     }
   };
 
@@ -199,7 +210,7 @@ const CreateItem = props => {
                 className="form-control input-field shadow-none"
                 onChange={handleInput}
                 onBlur={e =>
-                  (e.target.value < 0 || typeof e.target.value === "number") &&
+                  (e.target.value < 0 || typeof e.target.value === "number" || e.target.value === "") &&
                   dispatch({
                     type: "error",
                     key: e.target.name,

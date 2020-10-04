@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Profile = props => {
+  const { userId } = props.match.params;
   const [hasStore, toggleStore] = useState(true);
+
+  useEffect(
+    () => (document.title = userId === "user._id" ? "Your Profile" : "User Profile"),
+    []
+  );
 
   const deleteAccount = () => {
     if (
