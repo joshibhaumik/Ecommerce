@@ -12,6 +12,7 @@ import Cart from "./Screens/Cart";
 import Home from "./Screens/Home";
 import Notifications from "./Screens/Notifications";
 import DoesNotExists from "./Screens/DoesNotExists";
+import Loading from "./layout/Loading";
 import PrivateRoute from "./features/PrivateRoute";
 
 import { loadCurrentUser } from "../actions/userActions";
@@ -25,15 +26,16 @@ const Main = props => {
   return (
     <Router>
       <Switch>
-        <Layout>
+         <Layout auth={props.isAuthenticated} userId={props.isAuthenticated && props.user._id} storeId={props.isAuthenticated && props.user["store"]} >
+          <Loading status={props.isLoading} />
           <Route exact path="/" component={Home} />
-          <PrivateRoute path={"/notifications"} Component={Notifications} />
-          <PrivateRoute path={"/cart"} Component={Cart} />
-          <PrivateRoute path={"/stores/create"} Component={CreateStore} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/notifications"} Component={Notifications} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/cart"} Component={Cart} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/stores/create"} Component={CreateStore} />
           <Route path="/store/:storeId" component={Store} />
-          <PrivateRoute path={"/items/create"} Component={CreateItem} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/items/create"} Component={CreateItem} />
           <Route exact path="/item/:itemId" component={RenderItem} />
-          <PrivateRoute path={"/user/:userId"} Component={Profile} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/user/:userId"} Component={Profile} />
           {/* <Route exact path="/:str" component={DoesNotExists} /> */}
         </Layout>
       </Switch>

@@ -4,7 +4,6 @@ import { Route, withRouter } from "react-router-dom";
 import Login from "../Modals/LoginModal";
 
 const PrivateRoute = props => {
-  const [auth, toggleAuth] = useState(true);
   const [login, toggleLogin] = useState(true);
   const { Component } = props;
   return (
@@ -12,7 +11,7 @@ const PrivateRoute = props => {
       exact
       path={props.path}
       component={() => {
-        if (auth) {
+        if (props.auth) {
             return <Component />
         } else {
             return <Login show={login} handleClose={()=>{

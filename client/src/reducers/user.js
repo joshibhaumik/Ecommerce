@@ -12,19 +12,20 @@ export default function(state = initialState, action) {
         case USER_ISLOADED:
             return {
                 ...state,
-                auth: true,
-                loading:false,
+                isAuthenticated: true,
+                isLoading:false,
                 user: action.payload
             }
         case USER_ISLOADING:
             return {
                 ...state,
-                loading:true
+                isLoading:true
             }
         case USER_ERROR:
             return {
                 ...state,
-                error: action.payload
+                isLoading: false,
+                error: JSON.stringify(action.payload)
             }
         case USER_LOGOUT:
             return {

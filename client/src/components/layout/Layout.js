@@ -3,10 +3,11 @@ import React from "react";
 
 import Header from "./Header";
 
-const Layout = ({ children }) => {
+const Layout = ({ children, userId, storeId, auth }) => {
   return (
     <>
-      <Header />
+    {console.log(storeId)}
+      <Header auth={auth} userId={userId} storeId={storeId} />
       <div className="online-store-container">{children}</div>
     </>
   );
