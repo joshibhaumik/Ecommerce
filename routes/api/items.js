@@ -4,6 +4,8 @@ const Items = require("../../models/Items");
 const Store = require("../../models/Stores");
 const Reviews = require("../../models/Reviews");
 const auth = require("../../authenticate");
+const Users = require("../../models/Users");
+const Notifications = require("../../models/Notifications");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -16,48 +18,46 @@ router
   .route("/")
   .get(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       let items = await Items.find({});
-      res.json({ status: true, payload: items, error: "" });
+      res.status(200).json({ status: true, payload: items, error: "" });
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .post(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (String(req.user.store) === String(req.body.store)) {
         const store = await Store.findById(req.body.store);
         if (store === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "Store does not exists"
           });
         } else {
+          let body = req.body;
+          body["user"] = req.user._id;
           const item = await Items.create(req.body);
           store.items.push(item);
           const succ = await store.save();
-          res.json({ status: true, payload: item, error: "" });
+          res.status(201).json({ status: true, payload: item, error: "" });
         }
       } else {
-        res.json({
+        res.status(403).json({
           status: false,
           payload: [],
           error: "You cannot add items to other people's store"
         });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .put(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
+    res.statusCode = 501;
     res.json({
       status: false,
       payload: {},
@@ -66,14 +66,22 @@ router
   })
   .delete(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
-      let items = await Items.remove({});
-      let reviews = await Reviews.remove({});
-      res.json({ status: true, payload: items, error: "" });
+      const items = await Items.remove({});
+      const reviews = await Reviews.remove({});
+      const stores = await Store.find({});
+      const notifications = await Notifications.remove({});
+      const users = await Users.find({});
+      for (let store of stores) {
+        store.items = [];
+      }
+      for(let user of users) {
+        user.notifications = [];
+        user.cart = [];
+      }
+      res.status(200).json({ status: true, payload: items, error: "" });
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   });
 
@@ -85,22 +93,22 @@ router
   .route("/:itemId")
   .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       let item = await Items.findById(req.params.itemId);
       if (item === null) {
-        res.json({ status: false, payload: [], error: "Item does not exists" });
+        res
+          .status(404)
+          .json({ status: false, payload: [], error: "Item does not exists" });
       } else {
-        res.json({ status: true, payload: item, error: "" });
+        res.status(200).json({ status: true, payload: item, error: "" });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .post(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
+    res.statusCode = 501;
     res.json({
       status: false,
       payload: {},
@@ -109,12 +117,11 @@ router
   })
   .put(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (String(req.user.store) === String(req.body.store)) {
-        let store = await Store.findById(req.body.store);
+        let store = await Store.findById(req.user.store);
         if (store === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "Store does not exists"
@@ -126,33 +133,31 @@ router
             { new: true }
           );
           if (item === null) {
-            res.json({
+            res.status(404).json({
               status: false,
               payload: [],
               error: "Item does not exists"
             });
           } else {
-            res.json({ status: true, payload: item, error: "" });
+            res.status(204).json({ status: true, payload: item, error: "" });
           }
         }
       } else {
-        res.json({
+        res.status(403).json({
           status: false,
           payload: [],
           error: "You cannot modify somebody's item"
         });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .delete(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (req.user.store === undefined) {
-        res.json({
+        res.status(404).json({
           status: false,
           payload: [],
           error: "You don't have a store."
@@ -162,7 +167,7 @@ router
         if (store.items.includes(req.params.itemId)) {
           const item = await Items.findByIdAndRemove(req.params.itemId);
           if (item === null) {
-            res.json({
+            res.status(404).json({
               status: false,
               payload: [],
               error: "Item does not exists"
@@ -171,10 +176,10 @@ router
             const reviews = await Reviews.remove({ item: item._id });
             store.items.pull(String(item._id));
             const succ = await store.save();
-            res.json({ status: true, payload: item, error: "" });
+            res.status(200).json({ status: true, payload: item, error: "" });
           }
         } else {
-          res.json({
+          res.status(403).json({
             status: false,
             payload: [],
             error: "You cannot delete somebody's item"
@@ -182,8 +187,7 @@ router
         }
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   });
 

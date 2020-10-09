@@ -46,9 +46,11 @@ exports.validateAdmin = (req, res, next) => {
   if (req.user.isAdmin) {
     next();
   } else {
-    let error = new Error("404 No route found!");
-    res.statusCode = 404;
-    next(error);
+    res.status(404).json({
+      status: false,
+      payload:[],
+      error:"Path does not exists"
+    });
   }
 };
 
@@ -56,6 +58,10 @@ exports.verifyUser = (req, res, next)=> {
   if(req.isAuthenticated()) {
     next();
   } else {
-    res.redirect("/auth/login");
+    res.status(403).json({
+      status: false,
+      payload:[],
+      error:"You are not authorized to perform this operation"
+    });
   }
 };

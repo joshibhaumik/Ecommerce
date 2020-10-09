@@ -4,7 +4,7 @@ const User = require("../../models/Users");
 const Items = require("../../models/Items");
 const Store = require("../../models/Stores");
 const Reviews = require("../../models/Reviews");
-const Notification = require("../../models/Notifications");
+const Notifications = require("../../models/Notifications");
 const auth = require("../../authenticate");
 
 const router = express.Router();
@@ -16,20 +16,20 @@ router.use(bodyParser.json());
 */
 router.get("/current_user", (req, res) => {
   res.setHeader("Content-Type", "application/json");
-  if(req.user) {
+  if (req.user) {
     res.status(200).json({
-      status:true,
+      status: true,
       payload: req.user,
-      error:""
+      error: ""
     });
   } else {
     res.status(403).json({
-      status:false,
-      payload:[],
-      error:""
+      status: false,
+      payload: [],
+      error: ""
     });
   }
-})
+});
 
 /*
   @route /api/users/
@@ -39,19 +39,16 @@ router
   .route("/")
   .get(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       let users = await User.find({});
-      res.json({ status: true, payload: users, error: "" });
+      res.status(200).json({ status: true, payload: users, error: "" });
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .post((req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
-    res.json({
+    res.status(501).json({
       status: false,
       payload: [],
       error:
@@ -60,8 +57,7 @@ router
   })
   .put((req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
-    res.json({
+    res.status(501).json({
       status: false,
       payload: {},
       error: "PUT operation not allowed"
@@ -69,16 +65,19 @@ router
   })
   .delete(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
-      let users = await User.remove({});
-      let stores = await Store.remove({});
-      let items = await Items.remove({});
-      let reviews = await Reviews.remove({});
-      res.json({ status: true, payload: users, error: "" });
+      const users = await User.remove({});
+      const stores = await Store.remove({});
+      const items = await Items.remove({});
+      const reviews = await Reviews.remove({});
+      const notifications = await Notifications.remove({});
+      res.status(200).json({
+        status: true,
+        payload: { users, stores, items, reviews, notifications },
+        error: ""
+      });
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   });
 
@@ -90,23 +89,20 @@ router
   .route("/:userId")
   .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
-      let user = await User.findById(req.params.userId);
+      const user = await User.findById(req.params.userId);
       if (user === null) {
-        res.json({ status: false, payload: [], error: "User does not exists" });
+        res.status(404).json({ status: false, payload: [], error: "User not found" });
       } else {
-        res.json({ status: true, payload: user, error: "" });
+        res.status(200).json({ status: true, payload: user, error: "" });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .post(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
-    res.json({
+    res.status(501).json({
       status: false,
       payload: {},
       error: "POST operation not allowed"
@@ -114,8 +110,7 @@ router
   })
   .put(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
-    res.json({
+    res.status(501).json({
       status: false,
       payload: {},
       error: "PUT operation not allowed for Google OAuth"
@@ -123,15 +118,14 @@ router
   })
   .delete(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (String(req.params.userId) === String(req.user._id)) {
         const user = await User.findByIdAndRemove(req.params.userId);
         if (user === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
-            error: "User does not exists"
+            error: "User not found"
           });
         } else {
           const store = await Store.findByIdAndRemove(user.store);
@@ -139,23 +133,22 @@ router
             const items_ = await Items.find({ store: store._id });
             if (items_.length !== 0) {
               for (let item of items_) {
-                const reviews = await Reviews.remove({ item: item._id });
+                await Reviews.remove({ item: item._id });
               }
-              const items = await Items.remove({ store: store._id });
+              await Items.remove({ store: store._id });
             }
           }
-          res.json({ status: true, payload: user, error: "" });
+          res.status(200).json({ status: true, payload: user, error: "" });
         }
       } else {
-        res.json({
+        res.status(501).json({
           status: false,
           payload: [],
           error: "You cannot delete another person's account"
         });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   });
 
@@ -167,19 +160,18 @@ router
   .route("/:userId/cart/:itemId")
   .post(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (String(req.user._id) === String(req.params.userId)) {
         const user = await User.findById(req.params.userId);
         const item = await Items.findById(req.params.itemId);
         if (user === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "User does not exists"
           });
         } else if (item === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "Item you are trying to add does not exists"
@@ -187,21 +179,21 @@ router
         } else {
           user.cart.push(item);
           const succ = await user.save();
-          res.json({
+          res.status(200).json({
             status: true,
             payload: item,
             error: ""
           });
         }
       } else {
-        res.json({
+        res.status(403).json({
           status: false,
           payload: [],
           error: "You cannot add items to other people's cart."
         });
       }
     } catch (error) {
-      res.json({
+      res.status(500).json({
         status: false,
         payload: [],
         error: error
@@ -210,19 +202,18 @@ router
   })
   .delete(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (String(req.user._id) === String(req.params.userId)) {
         const user = await User.findById(req.params.userId);
         const item = await Items.findById(req.params.itemId);
         if (user === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "User does not exists"
           });
         } else if (item === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "Item you are trying to delete does not exists in the cart"
@@ -230,21 +221,21 @@ router
         } else {
           user.cart.pull(item._id);
           const succ = await user.save();
-          res.json({
+          res.status(200).json({
             status: true,
             payload: item,
             error: ""
           });
         }
       } else {
-        res.json({
+        res.status(403).json({
           status: false,
           payload: [],
           error: "You cannot delete items from other people's cart"
         });
       }
     } catch (error) {
-      res.json({
+      res.status(500).json({
         status: false,
         payload: [],
         error: error

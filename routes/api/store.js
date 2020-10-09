@@ -5,6 +5,7 @@ const User = require("../../models/Users");
 const Items = require("../../models/Items");
 const Reviews = require("../../models/Reviews");
 const auth = require("../../authenticate");
+const Notifications = require("../../models/Notifications");
 
 const router = express.Router();
 router.use(bodyparser.json());
@@ -17,40 +18,38 @@ router
   .route("/")
   .get(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       let stores = await Store.find({});
-      res.json({ status: true, payload: stores, error: "" });
+      res.status(200).json({ status: true, payload: stores, error: "" });
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .post(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
-      let user = await User.findById(req.user._id);
-      let store = await Store.create(req.body);
-      if (user.store === undefined) {
+      const user = await User.findById(req.user._id);
+      if (user.store !== undefined) {
+        const body = req.body;
+        body["user"] = req.user._id;
+        const store = await Store.create(body);
         user.store = store._id;
-        let succ = await user.save();
-        res.json({ status: true, payload: store, error: "" });
+        const succ = await user.save();
+        res.status(201).json({ status: true, payload: store, error: "" });
       } else {
-        res.json({
+        res.status(501).json({
           status: false,
           payload: [],
           error: "You already have a Store, please use that to sell Items"
         });
       }
     } catch (error) {
-      res.json({ status: false, payload: [], error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: [], error: error });
     }
   })
   .put(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
+    res.statusCode = 501;
     res.json({
       status: false,
       payload: {},
@@ -59,15 +58,22 @@ router
   })
   .delete(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       const stores = await Store.remove({});
       const items = await Items.remove({});
       const reviews = await Reviews.remove({});
-      res.json({ status: true, payload: stores, error: "" });
+      const users = await User.find({});
+      const notifications = await Notifications.remove({});
+      for (let user of users) {
+        user.store = undefined;
+        user.notifications = [];
+        user.cart = [];
+      }
+      res
+        .status(200)
+        .json({ status: true, payload: { stores, items, reviews, notifications }, error: "" });
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   });
 
@@ -79,26 +85,24 @@ router
   .route("/:storeId")
   .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       let store = await Store.findById(req.params.storeId);
       if (store === null) {
-        res.json({
+        res.status(404).json({
           status: false,
           payload: [],
           error: "Store does not exists"
         });
       } else {
-        res.json({ status: true, payload: store, error: "" });
+        res.status(200).json({ status: true, payload: store, error: "" });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .post(auth.verifyUser, (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
+    res.statusCode = 501;
     res.json({
       status: false,
       payload: {},
@@ -107,12 +111,11 @@ router
   })
   .put(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (String(req.user._id) === String(req.body.user)) {
         const user = await User.findById(req.body.user);
         if (user === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "User does not exists"
@@ -124,35 +127,33 @@ router
             { new: true }
           );
           if (store === null) {
-            res.json({
+            res.status(404).json({
               status: false,
               payload: [],
               error: "Store does not exists"
             });
           } else {
-            res.json({ status: true, payload: store, error: "" });
+            res.status(204).json({ status: true, payload: store, error: "" });
           }
         }
       } else {
-        res.json({
+        res.status(403).json({
           status: false,
           payload: [],
           error: "You cannot modify somebody's store."
         });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   })
   .delete(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
-    res.statusCode = 200;
     try {
       if (String(req.user.store) == String(req.params.storeId)) {
         const store = await Store.findByIdAndRemove(req.params.storeId);
         if (store === null) {
-          res.json({
+          res.status(404).json({
             status: false,
             payload: [],
             error: "Store does not exists"
@@ -168,18 +169,17 @@ router
             }
             const items = await Items.remove({ store: store._id });
           }
-          res.json({ status: true, payload: store, error: "" });
+          res.status(200).json({ status: true, payload: store, error: "" });
         }
       } else {
-        res.json({
+        res.status(403).json({
           status: false,
           payload: [],
           error: "You cannot delete somebody's store"
         });
       }
     } catch (error) {
-      res.json({ status: false, payload: {}, error: error });
-      next(error);
+      res.status(500).json({ status: false, payload: {}, error: error });
     }
   });
 

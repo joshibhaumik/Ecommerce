@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    email: {
+      type: String
+    },
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store"
