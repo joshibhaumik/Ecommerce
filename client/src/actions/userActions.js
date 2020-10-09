@@ -2,7 +2,8 @@ import {
   USER_ERROR,
   USER_ISLOADING,
   USER_ISLOADED,
-  USER_LOGOUT
+  USER_LOGOUT,
+  USER_DELETED
 } from "./types";
 import axios from "axios";
 
@@ -35,6 +36,17 @@ export const logoutUser = () => async dispatch => {
   }
 };
 
+export const deleteUser = userId => async dispatch => {
+  try {
+    dispatch({ type: USER_ISLOADING });
+    const user = await axios.delete("/api/users/" + userId);
+    dispatch({ type: USER_DELETED });
+  } catch (error) {
+    dispatch({ type: USER_ERROR, payload: error });
+    console.error(error);
+  }
+};
+
 export const fetchUser = userId => async dispatch => {
   try {
     dispatch({
@@ -50,5 +62,6 @@ export const fetchUser = userId => async dispatch => {
       type: USER_ERROR,
       payload: error
     });
+    console.error(error);
   }
 };

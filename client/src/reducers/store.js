@@ -1,7 +1,8 @@
 import {
   STORE_IS_LOADING,
   STORE_ERROR,
-  STORE_IS_LOADED
+  STORE_IS_LOADED,
+  STORE_DELETED
 } from "../actions/types";
 
 const init = {
@@ -28,6 +29,12 @@ export default function(state = init, action) {
         ...state,
         isLoading: false,
         error: JSON.stringify(action.payload)
+      };
+    case STORE_DELETED:
+      return {
+        ...state,
+        isLoading: false,
+        store: {}
       };
     default:
       return {
