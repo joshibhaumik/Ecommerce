@@ -6,6 +6,7 @@ const Store = require("../../models/Stores");
 const Reviews = require("../../models/Reviews");
 const Notifications = require("../../models/Notifications");
 const auth = require("../../authenticate");
+const Users = require("../../models/Users");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -16,10 +17,11 @@ router.use(bodyParser.json());
 */
 router.get("/current_user", (req, res) => {
   res.setHeader("Content-Type", "application/json");
+  const user = await Users.findById(req.user._id);
   if (req.user) {
     res.status(200).json({
       status: true,
-      payload: req.user,
+      payload: user,
       error: ""
     });
   } else {
@@ -92,7 +94,9 @@ router
     try {
       const user = await User.findById(req.params.userId);
       if (user === null) {
-        res.status(404).json({ status: false, payload: [], error: "User not found" });
+        res
+          .status(404)
+          .json({ status: false, payload: [], error: "User not found" });
       } else {
         res.status(200).json({ status: true, payload: user, error: "" });
       }
@@ -157,39 +161,25 @@ router
   @desc add and remove an item from the user cart
 */
 router
-  .route("/:userId/cart/:itemId")
+  .route("/cart/:itemId")
   .post(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      if (String(req.user._id) === String(req.params.userId)) {
-        const user = await User.findById(req.params.userId);
-        const item = await Items.findById(req.params.itemId);
-        if (user === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "User does not exists"
-          });
-        } else if (item === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "Item you are trying to add does not exists"
-          });
-        } else {
-          user.cart.push(item);
-          const succ = await user.save();
-          res.status(200).json({
-            status: true,
-            payload: item,
-            error: ""
-          });
-        }
-      } else {
-        res.status(403).json({
+      const user = await User.findById(req.user._id);
+      const item = await Items.findById(req.params.itemId);
+      if (item === null) {
+        req.status(404).json({
           status: false,
           payload: [],
-          error: "You cannot add items to other people's cart."
+          error: "Item does not exists."
+        });
+      } else {
+        user.cart.push(item._id);
+        await user.save();
+        res.status(200).json({
+          status: true,
+          payload: item,
+          error: ""
         });
       }
     } catch (error) {
@@ -203,35 +193,21 @@ router
   .delete(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      if (String(req.user._id) === String(req.params.userId)) {
-        const user = await User.findById(req.params.userId);
-        const item = await Items.findById(req.params.itemId);
-        if (user === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "User does not exists"
-          });
-        } else if (item === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "Item you are trying to delete does not exists in the cart"
-          });
-        } else {
-          user.cart.pull(item._id);
-          const succ = await user.save();
-          res.status(200).json({
-            status: true,
-            payload: item,
-            error: ""
-          });
-        }
-      } else {
-        res.status(403).json({
+      const user = await User.findById(req.user._id);
+      const item = await Items.findById(req.params.itemId);
+      if(item === null) {
+        req.status(404).json({
           status: false,
           payload: [],
-          error: "You cannot delete items from other people's cart"
+          error: "Item does not exists."
+        });
+      } else if(user.cart.includes(item._id)) {
+        user.cart.pull(item._id);
+        await user.save();
+        res.status(200).json({
+          status:true,
+          payload: item,
+          error:""
         });
       }
     } catch (error) {

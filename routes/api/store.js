@@ -29,12 +29,12 @@ router
     res.setHeader("Content-Type", "application/json");
     try {
       const user = await User.findById(req.user._id);
-      if (user.store !== undefined) {
+      if (user.store === undefined) {
         const body = req.body;
         body["user"] = req.user._id;
         const store = await Store.create(body);
         user.store = store._id;
-        const succ = await user.save();
+        await user.save();
         res.status(201).json({ status: true, payload: store, error: "" });
       } else {
         res.status(501).json({

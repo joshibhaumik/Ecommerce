@@ -10,6 +10,35 @@ const Notifications = require("../../models/Notifications");
 const router = express.Router();
 router.use(bodyParser.json());
 
+let skipItems = 0;
+
+/*
+  @route /api/items/get
+  @desc get all the items in the store iteration by iteration
+*/
+router.get("/get", async (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  try {
+    const items = await Items.find({}, null, {
+      sort: { createdOn: "asc" },
+      skip: skipItems,
+      limit: 30
+    });
+    skipItems += 30;
+    res.status(200).json({
+      status: true,
+      payload: items,
+      error: ""
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      payload: {},
+      error: error
+    });
+  }
+});
+
 /*
   @route /api/items/
   @desc CRUD operations for all the items
@@ -28,27 +57,24 @@ router
   .post(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      if (String(req.user.store) === String(req.body.store)) {
-        const store = await Store.findById(req.body.store);
-        if (store === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "Store does not exists"
-          });
-        } else {
-          let body = req.body;
-          body["user"] = req.user._id;
-          const item = await Items.create(req.body);
-          store.items.push(item);
-          const succ = await store.save();
-          res.status(201).json({ status: true, payload: item, error: "" });
-        }
-      } else {
-        res.status(403).json({
+      const user = await Users.findById(req.user._id);
+      if (user.store === undefined) {
+        res.status(501).json({
           status: false,
           payload: [],
-          error: "You cannot add items to other people's store"
+          error: "You don't have a store to add item."
+        });
+      } else {
+        const store = await Store.findById(user.store);
+        const body = req.body;
+        body["store"] = store._id;
+        const item = await Items.create(body);
+        store.items.push(item._id);
+        await store.save();
+        res.status(201).json({
+          status: true,
+          payload: item,
+          error: ""
         });
       }
     } catch (error) {
@@ -75,7 +101,7 @@ router
       for (let store of stores) {
         store.items = [];
       }
-      for(let user of users) {
+      for (let user of users) {
         user.notifications = [];
         user.cart = [];
       }
@@ -174,7 +200,7 @@ router
             });
           } else {
             const reviews = await Reviews.remove({ item: item._id });
-            store.items.pull(String(item._id));
+            store.items.pull(item._id);
             const succ = await store.save();
             res.status(200).json({ status: true, payload: item, error: "" });
           }

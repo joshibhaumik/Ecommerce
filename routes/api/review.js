@@ -27,56 +27,30 @@ router
   .post(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      if (String(req.user._id) === String(req.body.user)) {
-        const item = await Items.findById(req.body.item);
-        const user = await User.findById(req.user._id);
-        if (user === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "User does not exists"
-          });
-        } else {
-          if (item === null) {
-            res.status(404).json({
-              status: false,
-              payload: [],
-              error: "Item does not exists"
-            });
-          } else {
-            const review_ = await Reviews.find({ user: req.user._id }).where(
-              "item",
-              req.body.item
-            );
-            if (review_.length > 0) {
-              res.status(403).json({
-                status: false,
-                payload: [],
-                error: "You're not allowed to rate an item more then once"
-              });
-            } else {
-              const review = await Reviews.create(req.body);
-              item.reviews.push(review);
-              if (item.rating === -1) {
-                item.rating = review.rating;
-              } else {
-                item.rating =
-                  (item.rating * (item.reviews.length - 1) + review.rating) /
-                  item.reviews.length;
-              }
-              const succ = await item.save();
-              res
-                .status(201)
-                .json({ status: true, payload: review, error: "" });
-            }
-          }
-        }
-      } else {
-        res.status(403).json({
+      const user = await User.findById(req.user._id);
+      const item = await Items.findById(req.body.item);
+      if(item === null) {
+        res.status(404).json({
           status: false,
           payload: [],
-          error: "You cannot add review on other people's behalf"
+          error: "Item does not exists"
         });
+      } else {
+        const body = req.body;
+        body["user"] = user._id;
+        const review = await Reviews.create(body);
+        item.reviews.push(review._id);
+        if (item.rating === -1) {
+          item.rating = review.rating;
+        } else {
+          item.rating =
+            (item.rating * (item.reviews.length - 1) + review.rating) /
+            item.reviews.length;
+        }
+        await item.save();
+        res
+        .status(201)
+        .json({ status: true, payload: review, error: "" });
       }
     } catch (error) {
       res.status(500).json({ status: false, payload: {}, error: error });
@@ -205,7 +179,7 @@ router
           item.rating =
             (item.rating * item.reviews.length - review.rating) /
             (item.reviews.length - 1);
-          item.reviews.pull(String(review._id));
+          item.reviews.pull(review._id);
           let succ = await item.save();
           res.status(200).json({ status: true, payload: review, error: "" });
         } else {

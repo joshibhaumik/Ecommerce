@@ -26,43 +26,35 @@ router
   .post(auth.verifyUser, async (req, res) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      if (String(req.body.userFrom) === String(req.user._id)) {
-        const userFrom = await Users.findById(req.user._id);
-        if (userFrom.email === undefined) {
-          userFrom.email = req.body.email;
-          await userFrom.save();
-        }
-        const item = await Items.findById(req.body.item);
-        if (item === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "Item does not exists"
-          });
-        } else {
-          const body = {
-            userFrom: req.user._id,
-            userTo: item.user,
-            item: item._id,
-            itemName: item.name,
-            userFromDisplayName: req.user.displayName,
-            userFromEmail: req.user.email || req.body.email,
-            price: req.body.price,
-            quantity: req.body.quantity,
-            message: req.body.message
-          };
-          const notification = await Notifications.create(body);
-          res.status(200).json({
-            status: true,
-            payload: notification,
-            error: ""
-          });
-        }
-      } else {
-        res.status(403).json({
+      const userFrom = await Users.findById(req.user._id);
+      if (userFrom.email === undefined) {
+        userFrom.email = req.body.email;
+        await userFrom.save();
+      }
+      const item = await Items.findById(req.body.item);
+      if (item === null) {
+        res.status(404).json({
           status: false,
           payload: [],
-          error: "You are not authorized for this operation."
+          error: "Item does not exists"
+        });
+      } else {
+        const body = {
+          userFrom: req.user._id,
+          userTo: item.user,
+          item: item._id,
+          itemName: item.name,
+          userFromDisplayName: req.user.displayName,
+          userFromEmail: req.user.email || req.body.email,
+          price: req.body.price,
+          quantity: req.body.quantity,
+          message: req.body.message
+        };
+        const notification = await Notifications.create(body);
+        res.status(200).json({
+          status: true,
+          payload: notification,
+          error: ""
         });
       }
     } catch (error) {
