@@ -6,10 +6,10 @@ import {
   STORE_DELETED
 } from "./types";
 
-export const getStore = storeId => async dispatch => {
+export const getStore = () => async (dispatch, getState) => {
   try {
     dispatch({ type: STORE_IS_LOADING });
-    const store = await axios.get("/store/" + storeId);
+    const store = await axios.get("/store/" + getState().user.user._id);
     dispatch({
       type: STORE_IS_LOADED,
       payload: store.data
@@ -20,10 +20,10 @@ export const getStore = storeId => async dispatch => {
   }
 };
 
-export const deleteStore = storeId => async dispatch => {
+export const deleteStore = () => async (dispatch, getState) => {
   try {
     dispatch({ type: STORE_IS_LOADING });
-    const store = await axios.delete("/api/store/" + storeId);
+    await axios.delete("/api/store/" + getState().store.store._id);
     dispatch({ type: STORE_DELETED });
   } catch (error) {
     dispatch({ type: STORE_ERROR, payload: error });
@@ -48,7 +48,7 @@ export const createStore = storeDetails => async dispatch => {
 export const updateStore = storeDetails => async dispatch => {
   try {
     dispatch({ type: STORE_IS_LOADING });
-    const response = await axios.put("/api/store/" + storeDetails._id);
+    const response = await axios.put("/api/store/" + storeDetails._id, storeDetails);
     dispatch({
       type: STORE_IS_LOADED,
       payload: response.data.payload

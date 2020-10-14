@@ -2,11 +2,27 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../../styles/item.css";
 import ReviewModal from "../Modals/ReviewModal";
+import { connect } from 'react-redux';
+import axios from "axios";
 
 const RenderItem = props => {
+  const [response, setResponse] = useState({});
   const [show, toggleShow] = useState(false);
 
-  useEffect(() => (document.title = "Item"), []);
+  useEffect(() => {
+    const { items, match } = props;
+    const id = match.params.itemId
+    if(items[id] === undefined) {
+      try {
+        const response = axios.get("/api/items"+id);
+        console.log(response.data);
+      } catch (error) {
+        console.log(error => (error.response.data, error.response.status))
+      }
+    }
+    document.title = response.name || "Item";
+
+  }, []);
 
   const Capitalise = str => {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -101,4 +117,8 @@ const RenderItem = props => {
   );
 };
 
-export default RenderItem;
+const mapStateToProps = state => ({
+  items: state.cache.items
+})
+
+export default connect(mapStateToProps,)(RenderItem);

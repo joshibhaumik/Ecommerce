@@ -1,13 +1,15 @@
 import {
   ADD_USER_TO_CACHE,
   ADD_ITEM_TO_CACHE,
-  ADD_STORE_TO_CACHE
+  ADD_STORE_TO_CACHE,
+  ADD_ITEMS_TO_CACHE
 } from "../actions/types";
 
 const initialState = {
   users: {},
   stores: {},
-  items: {}
+  items: {},
+  Items: []
 };
 
 export default function(state = initialState, action) {
@@ -35,6 +37,11 @@ export default function(state = initialState, action) {
           ...state.items,
           [action.payload._id]: action.payload
         }
+      };
+    case ADD_ITEMS_TO_CACHE:
+      return {
+        ...state,
+        items: [...state.items, action.payload]
       };
     default:
       return {

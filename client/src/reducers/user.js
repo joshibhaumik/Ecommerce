@@ -35,10 +35,6 @@ export default function(state = initialState, action) {
       };
     case USER_LOGOUT:
       return {
-        ...state
-      };
-    case USER_DELETED:
-      return {
         ...state,
         isLoading: false,
         user: {},

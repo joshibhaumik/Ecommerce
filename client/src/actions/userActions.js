@@ -2,8 +2,7 @@ import {
   USER_ERROR,
   USER_ISLOADING,
   USER_ISLOADED,
-  USER_LOGOUT,
-  USER_DELETED
+  USER_LOGOUT
 } from "./types";
 import axios from "axios";
 
@@ -28,7 +27,7 @@ export const loadCurrentUser = () => async dispatch => {
 export const logoutUser = () => async dispatch => {
   try {
     dispatch({ type: USER_ISLOADING });
-    const user_ = await axios.get("/auth/logout");
+    await axios.get("/auth/logout");
     dispatch({ type: USER_LOGOUT });
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error });
@@ -39,29 +38,10 @@ export const logoutUser = () => async dispatch => {
 export const deleteUser = userId => async dispatch => {
   try {
     dispatch({ type: USER_ISLOADING });
-    const user = await axios.delete("/api/users/" + userId);
-    dispatch({ type: USER_DELETED });
+    await axios.delete("/api/users/" + userId);
+    dispatch({ type: USER_LOGOUT });
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error });
-    console.error(error);
-  }
-};
-
-export const fetchUser = userId => async dispatch => {
-  try {
-    dispatch({
-      type: USER_ISLOADING
-    });
-    const response = await axios.get("/api/user/" + userId);
-    dispatch({
-      type: USER_ISLOADED,
-      payload: response.data
-    });
-  } catch (error) {
-    dispatch({
-      type: USER_ERROR,
-      payload: error
-    });
     console.error(error);
   }
 };
