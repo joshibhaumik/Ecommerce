@@ -20,20 +20,23 @@ import { loadCurrentUser } from "../actions/userActions";
 const Main = props => {
   
   useEffect(()=> {
-    props.loadCurrentUser();
+    if(props.user._id === undefined) {
+      props.loadCurrentUser();
+    }
   }, []);
   
   return (
     <Router>
       <Switch>
-         <Layout auth={props.isAuthenticated} userId={props.isAuthenticated && props.user._id} storeId={props.isAuthenticated && props.user["store"]} >
+         <Layout>
           <Loading status={props.isLoading} />
           <Route exact path="/" component={Home} />
           <PrivateRoute auth={props.isAuthenticated} path={"/notifications"} Component={Notifications} />
           <PrivateRoute auth={props.isAuthenticated} path={"/cart"} Component={Cart} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/stores/create"} Component={CreateStore} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/my-store"} Component={Store} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/create/store"} Component={CreateStore} />
+          <PrivateRoute auth={props.isAuthenticated} path={"/create/item"} Component={CreateItem} />
           <Route path="/store/:storeId" component={Store} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/items/create"} Component={CreateItem} />
           <Route exact path="/item/:itemId" component={RenderItem} />
           <PrivateRoute auth={props.isAuthenticated} path={"/user/:userId"} Component={Profile} />
           {/* <Route exact path="/:str" component={DoesNotExists} /> */}

@@ -3,7 +3,10 @@ import {
   STORE_IS_LOADING,
   STORE_IS_LOADED,
   STORE_ERROR,
-  STORE_DELETED
+  STORE_DELETED,
+  USER_STORE_CREATED,
+  ITEM_DELETED_FROM_STORE,
+  ITEM_ADDED_TO_STORE
 } from "./types";
 
 export const getStore = () => async (dispatch, getState) => {
@@ -35,6 +38,29 @@ export const createStore = storeDetails => async dispatch => {
   try {
     dispatch({ type: STORE_IS_LOADING });
     const response = await axios.post("/api/store", storeDetails);
+    if (response.data.status) {
+      dispatch({
+        type: STORE_IS_LOADED,
+        payload: response.data.payload
+      });
+      dispatch({
+        type: USER_STORE_CREATED,
+        payload: response.data.payload._id
+      });
+    }
+  } catch (error) {
+    dispatch({ type: STORE_ERROR, payload: error });
+    console.error(error);
+  }
+};
+
+export const updateStore = storeDetails => async dispatch => {
+  try {
+    dispatch({ type: STORE_IS_LOADING });
+    const response = await axios.put(
+      "/api/store/" + storeDetails._id,
+      storeDetails
+    );
     dispatch({
       type: STORE_IS_LOADED,
       payload: response.data.payload
@@ -45,14 +71,32 @@ export const createStore = storeDetails => async dispatch => {
   }
 };
 
-export const updateStore = storeDetails => async dispatch => {
+export const addItemToStore = itemDetails => async dispatch => {
   try {
     dispatch({ type: STORE_IS_LOADING });
-    const response = await axios.put("/api/store/" + storeDetails._id, storeDetails);
-    dispatch({
-      type: STORE_IS_LOADED,
-      payload: response.data.payload
-    });
+    const response = await axios.post("/api/items/", itemDetails);
+    if (response.data.status) {
+      dispatch({
+        type: ITEM_ADDED_TO_STORE,
+        payload: response.data.payload
+      });
+    }
+  } catch (error) {
+    dispatch({ type: STORE_ERROR, payload: error });
+    console.error(error);
+  }
+};
+
+export const deleteItemToStore = itemDetails => async dispatch => {
+  try {
+    dispatch({ type: STORE_IS_LOADING });
+    const response = await axios.delete("/api/items/"+itemDetails._id);
+    if (response.data.status) {
+      dispatch({
+        type: ITEM_DELETED_FROM_STORE,
+        payload: response.data.payload._id
+      });
+    }
   } catch (error) {
     dispatch({ type: STORE_ERROR, payload: error });
     console.error(error);

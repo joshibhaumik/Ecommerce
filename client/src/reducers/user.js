@@ -3,7 +3,7 @@ import {
   USER_ISLOADING,
   USER_ERROR,
   USER_LOGOUT,
-  USER_DELETED
+  USER_STORE_CREATED
 } from "../actions/types";
 
 const initialState = {
@@ -40,6 +40,14 @@ export default function(state = initialState, action) {
         user: {},
         isAuthenticated: false
       };
+    case USER_STORE_CREATED:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          store: action.payload
+        }
+      }
     default:
       return state;
   }

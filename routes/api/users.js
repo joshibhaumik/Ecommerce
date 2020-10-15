@@ -15,9 +15,10 @@ router.use(bodyParser.json());
   @route /api/users/current_user/
   @desc Get the current logged in user
 */
-router.get("/current_user", (req, res) => {
+router.get("/current_user", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
-  const user = await Users.findById(req.user._id);
+  const id = req.user ? req.user._id : null
+  const user = await Users.findById(id);
   if (req.user) {
     res.status(200).json({
       status: true,

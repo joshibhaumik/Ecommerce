@@ -5,18 +5,18 @@ import Login from "../Modals/LoginModal";
 
 const PrivateRoute = props => {
   const [login, toggleLogin] = useState(true);
-  const { Component } = props;
+  const { Component, auth, path, history } = props;
   return (
     <Route
       exact
-      path={props.path}
+      path={path}
       component={() => {
-        if (props.auth) {
+        if (auth) {
             return <Component />
         } else {
             return <Login show={login} handleClose={()=>{
                 toggleLogin(false);
-                props.history.push("/");
+                history.push("/");
             }} />
         }
       }}

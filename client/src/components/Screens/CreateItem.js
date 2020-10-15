@@ -1,6 +1,8 @@
 import React, { useReducer, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
+import { addItemToStore } from "../../actions/storeAction";
+import { connect } from "react-redux";
 
 const initialState = {
   name: "",
@@ -37,7 +39,7 @@ const ItemCreationReducer = (state = initialState, action) => {
     case "error":
       return {
         ...state,
-        [action.key]: action.value
+        [action.key]: action.value,
       };
     case "imageName":
       return {
@@ -62,7 +64,9 @@ const CreateItem = props => {
     dispatch({ type: "overwrite", details });
   }
 
-  useEffect(()=> document.title = "Create an Item for your Store", []);
+  useEffect(() => {
+    document.title = "Create an Item for your Store";
+  }, []);
 
   const Capitalise = str => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -81,23 +85,28 @@ const CreateItem = props => {
         key: "toggleeError",
         value: true
       });
-    } else if (name === "" || price === "" || quantity === "" || image === "" || description === "") {
+    } else if (
+      name === "" ||
+      price === "" ||
+      quantity === "" ||
+      image === "" ||
+      description === ""
+    ) {
       dispatch({
         type: "error",
         key: "error",
         value: "Some fields are empty"
       });
     } else {
-      const formdata = new FormData();
-      formdata.append("name", name);
-      formdata.append("price", price);
-      formdata.append("quantity", quantity);
-      formdata.append("category", category);
-      formdata.append("image", image);
-      formdata.append("description", description);
-      formdata.append("store", "");
-      formdata.append("user", "");
-      // send the data to the server
+      props.addItemToStore({
+        name:name,
+        price:price,
+        quantity:quantity,
+        description:description,
+        category:category,
+        image:image
+      });
+      props.history.push("/my-store");
     }
   };
 
@@ -110,11 +119,11 @@ const CreateItem = props => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "Instagram-Clone");
-      formData.append("cloud_name", "smilingcloud");
+      formData.append("upload_preset", "ml_default");
+      formData.append("cloud_name", "dqaiapvgm");
 
       const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/smilingcloud/image/upload",
+        "https://api.cloudinary.com/v1_1/dqaiapvgm/image/upload",
         formData
       );
 
@@ -132,10 +141,16 @@ const CreateItem = props => {
 
       dispatch({ type: "imageName", value: file.name });
     } catch (error) {
+      console.log(error);
       dispatch({
         type: "error",
         key: "imageError",
         value: "Error occured while uploading the image, please try again."
+      });
+      dispatch({
+        type: "error",
+        key: "imageLoading",
+        value: ""
       });
     }
   };
@@ -210,7 +225,9 @@ const CreateItem = props => {
                 className="form-control input-field shadow-none"
                 onChange={handleInput}
                 onBlur={e =>
-                  (e.target.value < 0 || typeof e.target.value === "number" || e.target.value === "") &&
+                  (e.target.value < 0 ||
+                    typeof e.target.value === "number" ||
+                    e.target.value === "") &&
                   dispatch({
                     type: "error",
                     key: e.target.name,
@@ -336,4 +353,8 @@ const CreateItem = props => {
   );
 };
 
-export default withRouter(CreateItem);
+const mapStateToProps = state => ({
+  store: state.store.store
+});
+
+export default connect(mapStateToProps, { addItemToStore })(withRouter(CreateItem));

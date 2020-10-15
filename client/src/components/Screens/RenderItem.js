@@ -14,7 +14,7 @@ const RenderItem = props => {
     const id = match.params.itemId
     if(items[id] === undefined) {
       try {
-        const response = axios.get("/api/items"+id);
+        const response = axios.get("/api/items/"+id);
         console.log(response.data);
       } catch (error) {
         console.log(error => (error.response.data, error.response.status))
@@ -121,4 +121,4 @@ const mapStateToProps = state => ({
   items: state.cache.items
 })
 
-export default connect(mapStateToProps,)(RenderItem);
+export default connect(mapStateToProps)(RenderItem);

@@ -8,7 +8,9 @@ const Login = props => {
     window.location.href = "http://localhost:5000/auth/login";
   };
 
-  useEffect(() => (document.title = "Login"), []);
+  useEffect(() => {
+    document.title = "Login";
+  }, []);
 
   return (
     <Modal show={props.show} onHide={props.handleClose} animation={true}>

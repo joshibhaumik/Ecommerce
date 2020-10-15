@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { createStore } from "../../actions/storeAction";
 import "../../styles/store.css";
 
 const CreateStore = props => {
@@ -12,7 +14,12 @@ const CreateStore = props => {
   const [check, toggleCheck] = useState(false);
   const [error, setError] = useState(false);
 
-  useEffect(()=> document.title = "Create your Store", []);
+  useEffect(()=> {
+    if(props.user.store !== undefined) {
+      props.history.push("/my-store");
+    }
+    document.title = "Create your Store";
+  }, []);
 
   const validateInput = () => {
     let error = "";
@@ -41,8 +48,12 @@ const CreateStore = props => {
     if (!check) {
       setError(true);
     } 
-    if (nameError === "" && descriptionError === "" && check) {
-      props.history.push("/store");
+    if (storeName !== "" && storeDescription !== "" && check) {
+      props.createStore({
+        name: storeName,
+        description: storeDescription
+      });
+      props.history.push("/my-store");
     }
   };
 
@@ -127,4 +138,8 @@ const CreateStore = props => {
   );
 };
 
-export default withRouter(CreateStore);
+const mapStateToProps = state => ({
+  user: state.user.user
+});
+
+export default connect(mapStateToProps, { createStore })(withRouter(CreateStore));
