@@ -24,7 +24,7 @@ const Header = props => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="ml-4 mr-auto" style={{ fontSize: 19 }}>
             <Nav.Link href="/my-store" className="mr-2">
-              <i className="fas fa-store"></i> Store
+              <i className="fas fa-store"></i> My Store
             </Nav.Link>
             <Nav.Link href="/cart" className="ml-2 mr-2">
               <i className="fas fa-shopping-cart"></i> Cart

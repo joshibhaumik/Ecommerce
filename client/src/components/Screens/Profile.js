@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { connect } from "react-redux";
+import { deleteUser } from "../../actions/userActions";
 
 const Profile = props => {
-  const { userId } = props.match.params;
-  const [hasStore, toggleStore] = useState(true);
+  console.log(props.match);
+  const [response, setResponse] = useState({});
+  const [hasStore, toggleStore] = useState(false);
 
-  useEffect(
-    () => (document.title = userId === "user._id" ? "Your Profile" : "User Profile"),
-    []
-  );
+  const getUser = async id => {
+    const response = await axios.get("/api/users/5f698e32d265814d646e8899");
+    setResponse(response.data.payload);
+    document.title = response.data.payload.displayName;
+    if (response.data.payload.store !== undefined) {
+      toggleStore(true);
+    }
+  }
+
+  useEffect(() => {
+      getUser();
+    }, []);
 
   const deleteAccount = () => {
     if (
@@ -16,7 +28,7 @@ const Profile = props => {
         "Are you sure you want to delete your account? All your Information will be deleted."
       )
     ) {
-      // proceed to delete his/her account
+      props.deleteUser();
     }
   };
 
@@ -25,35 +37,37 @@ const Profile = props => {
       <div style={{ textAlign: "center" }}>
         <img
           style={{ borderRadius: "50%" }}
-          src={"https://picsum.photos/300"}
+          src={response.image}
           alt="Profile"
+          width={250}
+          height={250}
         />
       </div>
       <br />
       <div>
-        <h3 className="text-muted text-center">{"Display Name"}</h3>
+        <h3 className="text-muted text-center">{response.displayName}</h3>
         <br />
-        <table class="table" style={{ width: 750 }}>
+        <table className="table" style={{ width: 750 }}>
           <tbody>
             <tr>
               <td>First Name</td>
-              <td>Display</td>
+              <td>{response.firstName}</td>
             </tr>
             <tr>
               <td>Last Name</td>
-              <td>Name</td>
+              <td>{response.lastName}</td>
             </tr>
             <tr>
               <td>Store</td>
               <td>
                 {hasStore ? (
                   <div>
-                    Store. <Link to="/store/create">Edit Store</Link>
+                    Store <Link to="/store/create">Edit Store</Link>
                   </div>
                 ) : (
                   <div>
                     You don't have any store{" "}
-                    <Link to="/store/create">create one?</Link>
+                    <Link to="/store/create">Create One?</Link>
                   </div>
                 )}
               </td>
@@ -73,14 +87,18 @@ const Profile = props => {
           <hr />
         </div>
       )}
-      <div className="my-5">
-        <p style={{ color: "grey" }}>Do you want to delete your account?</p>
+      {true === props.user._id && <div className="my-5">
+        <p className="text-muted">Do you want to delete your account?</p>
         <button className="btn btn-danger" onClick={deleteAccount}>
           Delete Your Account
         </button>
-      </div>
+      </div>}
     </div>
   );
 };
 
-export default Profile;
+const mapStateToProps = state => ({
+  user:state.user.user
+});
+
+export default connect(mapStateToProps, { deleteUser })(Profile);

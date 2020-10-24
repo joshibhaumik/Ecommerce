@@ -35,13 +35,29 @@ export const logoutUser = () => async dispatch => {
   }
 };
 
-export const deleteUser = userId => async dispatch => {
+export const deleteUser = () => async (dispatch, getState) => {
   try {
     dispatch({ type: USER_ISLOADING });
-    await axios.delete("/api/users/" + userId);
+    await axios.delete("/api/users/" + getState().user.user._id);
     dispatch({ type: USER_LOGOUT });
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error });
     console.error(error);
   }
 };
+
+export const addItemCart = item => async dispatch => {
+  try {
+    
+  } catch (error) {
+    
+  }
+}
+
+export const removeItemCart = item => async dispatch => {
+  try {
+    
+  } catch (error) {
+    
+  }
+}

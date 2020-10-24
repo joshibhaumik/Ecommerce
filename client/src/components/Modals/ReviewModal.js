@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
+import axios from "axios";
+import { connect } from "react-redux";
 
 const ReviewModal = props => {
   const [comment, setComment] = useState(props.comment_ || "");
@@ -19,13 +21,24 @@ const ReviewModal = props => {
     props.handleClose();
   }
 
-  const AddAReview = () => {
-    validateComment();
-    if (comment != "") {
-      // add a review
+  const AddAReview = async () => {
+    if(!props.auth) {
+      window.alert("You cannot add a review. Please Login");
+    } else {
+      validateComment();
+      if (comment !== "") {
+        const response = await axios.post("/api/reviews/", {
+          displayName: props.user.displayName,
+          item: props.id,
+          review: comment,
+          rating: rating 
+        });
+        props.addReview(response.data.payload);
+      }
+      reset();
     }
-    reset();
   };
+
   return (
     <Modal
       backdrop="static"
@@ -45,7 +58,7 @@ const ReviewModal = props => {
                 <label htmlFor="comment">Comment</label>
                 <textarea
                   id="comment"
-                  class="form-control"
+                  className="form-control"
                   rows={3}
                   onChange={e => setComment(e.target.value)}
                   value={comment}
@@ -65,7 +78,7 @@ const ReviewModal = props => {
                   onChange={e => setRating(e.target.value)}
                 >
                   {[1, 2, 3, 4, 5].map(e => (
-                    <option value={e}>{e}</option>
+                    <option key={e} value={e}>{e}</option>
                   ))}
                 </select>
               </div>
@@ -85,4 +98,9 @@ const ReviewModal = props => {
   );
 };
 
-export default ReviewModal;
+const mapStateToProps = state => ({
+  user:state.user.user,
+  auth: state.user.isAuthenticated
+});
+
+export default connect(mapStateToProps)(ReviewModal);

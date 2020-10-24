@@ -2,43 +2,80 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../../styles/item.css";
 import ReviewModal from "../Modals/ReviewModal";
-import { connect } from 'react-redux';
 import axios from "axios";
+import { connect } from "react-redux";
 
 const RenderItem = props => {
   const [response, setResponse] = useState({});
   const [show, toggleShow] = useState(false);
+  const [reviews, setReviews] = useState([]);
+
+  const getDetails = async id => {
+    try {
+      const response = await axios.get("/api/items/5f881ea514f299401c2548d1");
+      setResponse(response.data.payload);
+      setReviews(response.data.payload.reviews);
+      document.title = Capitalise(response.data.payload.name);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    const { items, match } = props;
-    const id = match.params.itemId
-    if(items[id] === undefined) {
-      try {
-        const response = axios.get("/api/items/"+id);
-        console.log(response.data);
-      } catch (error) {
-        console.log(error => (error.response.data, error.response.status))
-      }
-    }
-    document.title = response.name || "Item";
-
+    getDetails(props.match.params.itemId);
   }, []);
 
   const Capitalise = str => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
+  const ReviewAddedRating = review => {
+    let { rating } = response;
+    rating = (rating*(reviews.length) + review.rating) / (reviews.length + 1);
+    setResponse({
+      ...response,
+      rating: rating
+    });
+  };
+
+  const ReviewDeleteRating = async review => {
+    try {
+      const res = await axios.delete("/api/reviews/"+review._id);
+      let { rating } = response;
+      rating = (rating*(reviews.length) - review.rating) / (reviews.length - 1);
+      setResponse({
+        ...response,
+        rating: rating
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const AddReview = review => {
+    setReviews([review, ...reviews]);
+    ReviewAddedRating(review);
+  };
+
+  const DeleteReview = review => {
+    if(window.confirm("Are you sure you want to delete your review?")) {
+      setReviews(reviews.filter(e => e._id !== review._id));
+      ReviewDeleteRating(review);
+    }
+  };
+
   const RenderReview = review => (
     <tr>
       <td>
         <div>
-          <Link to={"/user/" + review.userId}>{review.name}</Link>
+          <Link to={"/user/" + review.user}>{review.displayName}</Link>
           <span className="ml-4 text-muted" style={{ fontSize: 13 }}>
             {review.createdAt}
           </span>
+          {(props.auth && (props.user._id === review.user)) && <i style={{cursor:"pointer"}} onClick={() => DeleteReview(review)} className="text-danger float-right fas fa-trash-alt"></i>}
         </div>
         <div>Rating: {review.rating}</div>
-        <p>{review.comment}</p>
+        <p>{review.review}</p>
       </td>
     </tr>
   );
@@ -55,34 +92,42 @@ const RenderItem = props => {
       <div className="mt-4 center-it render-items-container">
         <div className="row">
           <div className="col-sm-6">
-            <img src={"https://picsum.photos/400"} alt="Item" />
+            <img src={response.image} alt="Item" />
           </div>
           <div className="offset-sm-1 col-sm-5">
             <h3 className="ml-2 text-muted">
-              {Capitalise(props.match.params.itemId)}
+              {Capitalise(response.name || "")}
             </h3>
             <table className="table">
               <tbody>
                 <tr>
                   <td>Price per Quantity</td>
-                  <td>$4.5</td>
+                  <td>{response.price}</td>
                 </tr>
                 <tr>
                   <td>Quantities Available</td>
-                  <td>20</td>
+                  <td>{response.quantity}</td>
                 </tr>
                 <tr>
                   <td>Category</td>
-                  <td>{Capitalise("fruits")}</td>
+                  <td>{Capitalise(response.category || "")}</td>
                 </tr>
                 <tr>
                   <td>Rating</td>
-                  <td>{4.5 ? 4.5 : "Unrated"}</td>
+                  <td>
+                    {(response.rating === -1 || response.rating === 0) ? "Unrated" : response.rating}
+                  </td>
                 </tr>
+                {reviews.length && <tr>
+                  <td>Reviews</td>
+                  <td>
+                    {reviews.length}
+                  </td>
+                </tr>}
                 <tr>
                   <td>Store</td>
                   <td>
-                    <Link to="/store/storeName">Visit Store?</Link>
+                    <Link to={"/store/" + response.store}>Visit Store?</Link>
                   </td>
                 </tr>
               </tbody>
@@ -92,33 +137,37 @@ const RenderItem = props => {
         <div>
           <hr />
           <h3 className="text-muted">Description</h3>
-          <p className="p-3">
-            Ut eu lorem auctor, blandit magna a, ornare erat.
-          </p>
+          <p className="p-3">{response.description}</p>
           <hr />
         </div>
         <div>
           <h1 className="text-muted">Reviews</h1>
           <div className="mb-4 p-3">
-            {[].length === 0 ? (
+            {reviews.length === 0 ? (
               <p className="text-muted">
                 No reviews yet. Be the first to review it?
               </p>
             ) : (
               <table className="table table-striped">
-                <tbody>{[].map(e => RenderReview(e))}</tbody>
+                <tbody>{reviews.map(e => RenderReview(e))}</tbody>
               </table>
             )}
           </div>
         </div>
       </div>
-      <ReviewModal show={show} handleClose={() => toggleShow(false)} />
+      <ReviewModal
+        id={response._id}
+        addReview={AddReview}
+        show={show}
+        handleClose={() => toggleShow(false)}
+      />
     </>
   );
 };
 
 const mapStateToProps = state => ({
-  items: state.cache.items
-})
+  user: state.user.user,
+  auth: state.user.isAuthenticated
+});
 
 export default connect(mapStateToProps)(RenderItem);

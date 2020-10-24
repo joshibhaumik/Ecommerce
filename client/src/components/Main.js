@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 
 import Layout from "./layout/Layout";
 import Store from "./Screens/Store";
+import MyStore from "./Screens/MyStore";
 import CreateStore from "./Screens/CreateStore";
 import RenderItem from "./Screens/RenderItem";
 import CreateItem from "./Screens/CreateItem";
@@ -18,27 +19,44 @@ import PrivateRoute from "./features/PrivateRoute";
 import { loadCurrentUser } from "../actions/userActions";
 
 const Main = props => {
-  
-  useEffect(()=> {
-    if(props.user._id === undefined) {
+  useEffect(() => {
+    if (props.user._id === undefined) {
       props.loadCurrentUser();
     }
   }, []);
-  
+
   return (
     <Router>
       <Switch>
-         <Layout>
+        <Layout>
           <Loading status={props.isLoading} />
           <Route exact path="/" component={Home} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/notifications"} Component={Notifications} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/cart"} Component={Cart} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/my-store"} Component={Store} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/create/store"} Component={CreateStore} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/create/item"} Component={CreateItem} />
+          <PrivateRoute
+            path={"/notifications"}
+            Component={Notifications}
+          />
+          <PrivateRoute
+            path={"/cart"}
+            Component={Cart}
+          />
+          <PrivateRoute
+            path={"/my-store"}
+            Component={MyStore}
+          />
+          <PrivateRoute
+            path={"/create/store"}
+            Component={CreateStore}
+          />
+          <PrivateRoute
+            path={"/create/item"}
+            Component={CreateItem}
+          />
           <Route path="/store/:storeId" component={Store} />
           <Route exact path="/item/:itemId" component={RenderItem} />
-          <PrivateRoute auth={props.isAuthenticated} path={"/user/:userId"} Component={Profile} />
+          <PrivateRoute
+            path={"/user/:userId"}
+            Component={Profile}
+          />
           {/* <Route exact path="/:str" component={DoesNotExists} /> */}
         </Layout>
       </Switch>
@@ -51,11 +69,10 @@ const mapStateToProps = state => {
     user: state.user.user,
     isAuthenticated: state.user.isAuthenticated,
     isLoading: state.user.isLoading
-  }
-}
+  };
+};
 
-const mapDispatchToProps = (dispatch) => ({
-  loadCurrentUser: () => dispatch(loadCurrentUser()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default connect(
+  mapStateToProps,
+  { loadCurrentUser }
+)(Main);

@@ -2,7 +2,9 @@ import React, { useEffect } from "react";
 import "../../styles/loading.css";
 
 const Loading = ({ status }) => {
-  useEffect(() => (document.title = "Loading..."), []);
+  useEffect(() => {
+    document.title = "Loading..."
+  }, []);
   return status && 
     <div
       style={{ height: document.documentElement.scrollHeight }}

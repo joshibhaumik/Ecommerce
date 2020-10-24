@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Route, withRouter } from "react-router-dom";
 
 import Login from "../Modals/LoginModal";
+import { connect } from "react-redux";
 
 const PrivateRoute = props => {
   const [login, toggleLogin] = useState(true);
@@ -10,18 +11,27 @@ const PrivateRoute = props => {
     <Route
       exact
       path={path}
-      component={() => {
+      location={props.location}
+      key={props.location.key}
+      render={(location, match) => {
         if (auth) {
-            return <Component />
+          return <Component key={props.location.key} match={match} />;
         } else {
-            return <Login show={login} handleClose={()=>{
+          return (
+            <Login
+              show={login}
+              handleClose={() => {
                 toggleLogin(false);
                 history.push("/");
-            }} />
+              }}
+            />
+          );
         }
       }}
     />
   );
 };
-
-export default withRouter(PrivateRoute);
+const mapStateToProps = state => ({
+  auth: state.user.isAuthenticated
+});
+export default connect(mapStateToProps)(withRouter(PrivateRoute));

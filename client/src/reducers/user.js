@@ -3,7 +3,9 @@ import {
   USER_ISLOADING,
   USER_ERROR,
   USER_LOGOUT,
-  USER_STORE_CREATED
+  USER_STORE_CREATED,
+  ADD_ITEM_TO_CART,
+  REMOVE_ITEM_FROM_CART
 } from "../actions/types";
 
 const initialState = {
@@ -46,6 +48,22 @@ export default function(state = initialState, action) {
         user: {
           ...state.user,
           store: action.payload
+        }
+      }
+    case ADD_ITEM_TO_CART:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          cart: []
+        }
+      }
+    case REMOVE_ITEM_FROM_CART:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          cart:[]
         }
       }
     default:
