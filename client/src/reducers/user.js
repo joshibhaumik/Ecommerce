@@ -5,7 +5,8 @@ import {
   USER_LOGOUT,
   USER_STORE_CREATED,
   ADD_ITEM_TO_CART,
-  REMOVE_ITEM_FROM_CART
+  REMOVE_ITEM_FROM_CART,
+  DELETE_NOTIFICATION
 } from "../actions/types";
 
 const initialState = {
@@ -53,17 +54,28 @@ export default function(state = initialState, action) {
     case ADD_ITEM_TO_CART:
       return {
         ...state,
+        isLoading: false,
         user: {
           ...state.user,
-          cart: []
+          cart: [...state.user.cart, action.payload]
         }
       }
     case REMOVE_ITEM_FROM_CART:
       return {
         ...state,
+        isLoading: false,
         user: {
           ...state.user,
-          cart:[]
+          cart:state.user.cart.filter(e => e._id !== action.payload._id)
+        }
+      }
+    case DELETE_NOTIFICATION:
+      return {
+        ...state,
+        isLoading: false,
+        user: {
+          ...state.user,
+          notifications: state.user.notifications.filter(e => e._id !== action.payload._id )
         }
       }
     default:

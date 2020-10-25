@@ -10,37 +10,13 @@ const Notifications = require("../../models/Notifications");
 const router = express.Router();
 router.use(bodyParser.json());
 
-let skipItems = 0;
-
-/*
-  @route /api/items/get
-  @desc get all the items in the store iteration by iteration
-*/
-router.get("/get", async (req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  try {
-    const items = await Items.find({});
-    res.status(200).json({
-      status: true,
-      payload: items,
-      error: ""
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: false,
-      payload: {},
-      error: error
-    });
-  }
-});
-
 /*
   @route /api/items/
   @desc CRUD operations for all the items
 */
 router
   .route("/")
-  .get(auth.verifyUser, auth.validateAdmin, async (req, res, next) => {
+  .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
       let items = await Items.find({});

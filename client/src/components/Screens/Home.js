@@ -8,7 +8,7 @@ const Home = () => {
 
   const getItems = async () => {
     try {
-      const response = await axios.get("/api/items/get");
+      const response = await axios.get("/api/items/");
       setResponse(response.data.payload);
       document.title = "Welcome to Online Store"
       console.log(response.data.payload);

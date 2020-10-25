@@ -1,30 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
+import { connect } from "react-redux";
 
 import Items from "../layout/Items";
 import "../../styles/cart.css";
 
 const Cart = props => {
     const [showModal, toggleModal] = useState(false);
-    const [data, setData] = useState([{
-        "id":0,
-        "name":"First Item",
-        "price":"25",
-        "quantity":"45",
-        "description":"first item.",
-        "category":"fruits",
-        "image":"https://picsum.photos/500",
-        "rating":4.5
-    },{
-        "id":1,
-        "name":"First Item",
-        "price":"25",
-        "quantity":"45",
-        "description":"first item.",
-        "category":"fruits",
-        "image":"https://picsum.photos/500",
-        "rating":4.5
-    }]);
+    const [data, setData] = useState(props.user.cart);
 
     useEffect(()=> {
         document.title = "Your Cart";
@@ -70,5 +53,9 @@ const Cart = props => {
         </div>
     );
 }
+
+const mapStateToProps = state => ({
+    user: state.user.user
+});
  
-export default Cart;
+export default connect(mapStateToProps)(Cart);

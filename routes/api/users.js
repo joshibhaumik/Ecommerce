@@ -18,7 +18,7 @@ router.use(bodyParser.json());
 router.get("/current_user", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   const id = req.user ? req.user._id : null
-  const user = await Users.findById(id);
+  const user = await Users.findById(id).populate("cart notifications");
   if (req.user) {
     res.status(200).json({
       status: true,
