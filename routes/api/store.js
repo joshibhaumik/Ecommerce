@@ -86,7 +86,7 @@ router
   .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      let store = await Store.findById(req.params.storeId);
+      let store = await Store.findById(req.params.storeId).populate("items");
       if (store === null) {
         res.status(404).json({
           status: false,

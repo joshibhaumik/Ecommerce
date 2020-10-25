@@ -22,7 +22,7 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-.edit-store-button, .notification-store-button {
+.edit-store-button, .notification-store-button, .delete-store-button {
   position: absolute;
   right:0px;  
   top:75px;

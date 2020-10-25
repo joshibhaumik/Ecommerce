@@ -19,12 +19,7 @@ let skipItems = 0;
 router.get("/get", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   try {
-    const items = await Items.find({}, null, {
-      sort: { createdOn: "asc" },
-      skip: skipItems,
-      limit: 30
-    });
-    skipItems += 30;
+    const items = await Items.find({});
     res.status(200).json({
       status: true,
       payload: items,

@@ -26,7 +26,9 @@ const Cart = props => {
         "rating":4.5
     }]);
 
-    useEffect(()=> document.title = "Your Cart", []);
+    useEffect(()=> {
+        document.title = "Your Cart";
+    }, []);
 
     const calculateAmount = () => {
         let amt = 0;

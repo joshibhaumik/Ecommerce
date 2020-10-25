@@ -15,13 +15,23 @@ const Items = props => {
     });
   };
 
+  const deleteItem = details => {
+    // delete the item
+  }
+
   const RenderAnItem = details => (
     <div className="my-4 col-sm-3">
       {props.canEdit && (
-        <i
-          className="fas fa-edit edit-icon store-gn-color"
-          onClick={() => editItem(details)}
-        ></i>
+        <div>
+          <i
+            className="fas fa-trash-alt delete-icon"
+            onClick={() => deleteItem(details)}
+          ></i>
+          <i
+            className="fas fa-edit edit-icon store-gn-color"
+            onClick={() => editItem(details)}
+          ></i>
+        </div>
       )}
       <Card className="render-an-item-card">
         <Card.Img className="render-an-item-image" variant="top" src={details.image} />
@@ -31,8 +41,8 @@ const Items = props => {
             <kbd className="float-right">{details.rating || "unrated"}</kbd>
           </Card.Title>
           <div className="mt-3">
-            <span style={{ fontSize: 18 }}>Price: ${details.price}</span>
-            <button className="btn float-right shadow-none store-gn-color add-to-cart-button">Add To Cart</button>
+            <span style={{ fontSize: 18 }}>Price: {details.price}</span>
+            {!props.canEdit && <button className="btn float-right shadow-none store-gn-color add-to-cart-button">Add To Cart</button>}
         </div>
         </Card.Body>
       </Card>

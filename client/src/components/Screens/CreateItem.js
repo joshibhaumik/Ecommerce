@@ -68,6 +68,11 @@ const CreateItem = props => {
     document.title = "Create an Item for your Store";
   }, []);
 
+  if(props.user.store === undefined) {
+    window.alert("First Create a Store, then you can create an Item.");
+    props.history.push("/create/store");
+  }
+
   const Capitalise = str => str.charAt(0).toUpperCase() + str.slice(1);
 
   const handleSubmit = e => {
@@ -354,7 +359,8 @@ const CreateItem = props => {
 };
 
 const mapStateToProps = state => ({
-  store: state.store.store
+  store: state.store.store,
+  user: state.user.user
 });
 
 export default connect(mapStateToProps, { addItemToStore })(withRouter(CreateItem));

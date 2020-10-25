@@ -8,19 +8,26 @@
     height: auto;
 }
 
-.edit-icon {
+.delete-icon, .edit-icon {
     position: relative;
     font-size: 20px;
     color: white;
     z-index: 3;
     top: 20px;
-    left: 200px;
+    left: 180px;
     width: 35px;
     height: 35px;
     padding-top: 6px;
     padding-left: 7.5px;
     border-radius: 50%;
     cursor: pointer;
+}
+
+.delete-icon {
+    padding-top: 7px;
+    padding-left: 8.5px;
+    background-color: red;
+    left:45px;
 }
 
 .render-an-item-image {

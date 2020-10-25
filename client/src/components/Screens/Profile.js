@@ -3,24 +3,34 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { connect } from "react-redux";
 import { deleteUser } from "../../actions/userActions";
+import { withRouter } from "react-router-dom";
 
 const Profile = props => {
-  console.log(props.match);
   const [response, setResponse] = useState({});
   const [hasStore, toggleStore] = useState(false);
 
   const getUser = async id => {
-    const response = await axios.get("/api/users/5f698e32d265814d646e8899");
-    setResponse(response.data.payload);
-    document.title = response.data.payload.displayName;
-    if (response.data.payload.store !== undefined) {
-      toggleStore(true);
+    try {
+      const response = await axios.get(
+        "/api/users/" + props.match.params.userId
+      );
+      const res = await axios.get("/api/store/" + response.data.payload.store);
+      setResponse({
+        ...response.data.payload,
+        description: res.data.payload.description
+      });
+      document.title = response.data.payload.displayName;
+      if (response.data.payload.store !== undefined) {
+        toggleStore(true);
+      }
+    } catch (error) {
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
-      getUser();
-    }, []);
+    getUser();
+  }, []);
 
   const deleteAccount = () => {
     if (
@@ -62,12 +72,20 @@ const Profile = props => {
               <td>
                 {hasStore ? (
                   <div>
-                    Store <Link to="/store/create">Edit Store</Link>
+                    {props.match.params.userId === props.user._id ? (
+                      <Link to="/store/create">Edit Store</Link>
+                    ) : (
+                      <Link to={"/store/" + response.store}>Visit Store</Link>
+                    )}
                   </div>
-                ) : (
+                ) : props.match.params.userId === props.user._id ? (
                   <div>
                     You don't have any store{" "}
                     <Link to="/store/create">Create One?</Link>
+                  </div>
+                ) : (
+                  <div className="text-muted">
+                    {response.displayName} does not have a Store.
                   </div>
                 )}
               </td>
@@ -79,26 +97,27 @@ const Profile = props => {
         <div>
           <hr />
           <h3 className="text-muted">Store Description</h3>
-          <p className="p-3">
-            {
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec mattis nulla quis ex semper porta. Vivamus vel metus sed augue interdum lacinia. Cras diam sapien, elementum ac sodales sit amet, fermentum sed augue. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus dui risus, convallis in lorem sed, vulputate posuere quam. In maximus dolor quis lorem iaculis imperdiet. Donec mollis sapien nec arcu volutpat ultrices."
-            }
-          </p>
+          <p className="p-3">{response.description}</p>
           <hr />
         </div>
       )}
-      {true === props.user._id && <div className="my-5">
-        <p className="text-muted">Do you want to delete your account?</p>
-        <button className="btn btn-danger" onClick={deleteAccount}>
-          Delete Your Account
-        </button>
-      </div>}
+      {props.match.params.userId === props.user._id && (
+        <div className="my-5">
+          <p className="text-muted">Do you want to delete your account?</p>
+          <button className="btn btn-danger" onClick={deleteAccount}>
+            Delete Your Account
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
 const mapStateToProps = state => ({
-  user:state.user.user
+  user: state.user.user
 });
 
-export default connect(mapStateToProps, { deleteUser })(Profile);
+export default connect(
+  mapStateToProps,
+  { deleteUser }
+)(withRouter(Profile));

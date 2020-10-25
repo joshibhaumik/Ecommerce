@@ -57,7 +57,6 @@ const Main = props => {
             path={"/user/:userId"}
             Component={Profile}
           />
-          {/* <Route exact path="/:str" component={DoesNotExists} /> */}
         </Layout>
       </Switch>
     </Router>

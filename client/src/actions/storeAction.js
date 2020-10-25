@@ -12,10 +12,10 @@ import {
 export const getStore = () => async (dispatch, getState) => {
   try {
     dispatch({ type: STORE_IS_LOADING });
-    const store = await axios.get("/store/" + getState().user.user._id);
+    const store = await axios.get("/api/store/" + getState().user.user.store);
     dispatch({
       type: STORE_IS_LOADED,
-      payload: store.data
+      payload: store.data.payload
     });
   } catch (error) {
     dispatch({ type: STORE_ERROR, payload: error });

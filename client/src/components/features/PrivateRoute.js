@@ -11,11 +11,9 @@ const PrivateRoute = props => {
     <Route
       exact
       path={path}
-      location={props.location}
-      key={props.location.key}
-      render={(location, match) => {
+      render={() => {
         if (auth) {
-          return <Component key={props.location.key} match={match} />;
+          return <Component />;
         } else {
           return (
             <Login
@@ -31,7 +29,9 @@ const PrivateRoute = props => {
     />
   );
 };
+
 const mapStateToProps = state => ({
   auth: state.user.isAuthenticated
 });
+
 export default connect(mapStateToProps)(withRouter(PrivateRoute));
