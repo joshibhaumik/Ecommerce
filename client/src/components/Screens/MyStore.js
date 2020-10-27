@@ -6,7 +6,6 @@ import { connect } from "react-redux";
 import { deleteStore, getStore } from "../../actions/storeAction";
 
 const MyStore = props => {
-  console.log(props.store);
   useEffect(() => {
     props.getStore();
     document.title = props.user.store
@@ -42,21 +41,12 @@ const MyStore = props => {
       <div>
         <button
           title="Delete Store"
-          style={{ right: window.innerWidth <= 800 ? 100 : 325 }}
+          style={{ right: window.innerWidth <= 800 ? 50 : 150 }}
           onClick={DeleteStore}
           className="btn btn-danger delete-store-button"
         >
           <i className="fas fa-trash-alt"></i>{" "}
           {window.innerWidth <= 800 ? "" : "Delete Store"}
-        </button>
-        <button
-          title="Your Notifications"
-          style={{ right: window.innerWidth <= 800 ? 50 : 150 }}
-          onClick={() => props.history.push("/notifications")}
-          className="btn btn-general notification-store-button"
-        >
-          <i className="fas fa-bell"></i>{" "}
-          {window.innerWidth <= 800 ? "" : "Notifications"}
         </button>
         <button
           title="Edit Store"

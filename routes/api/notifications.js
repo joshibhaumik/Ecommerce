@@ -4,6 +4,7 @@ const auth = require("../../authenticate");
 const Notifications = require("../../models/Notifications");
 const Users = require("../../models/Users");
 const Items = require("../../models/Items");
+const Store = require("../../models/Stores");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -39,9 +40,10 @@ router
           error: "Item does not exists"
         });
       } else {
+        const store = await Store.findById(item.store);
         const body = {
           userFrom: req.user._id,
-          userTo: item.user,
+          userTo: store.user,
           item: item._id,
           itemName: item.name,
           userFromDisplayName: req.user.displayName,
@@ -51,6 +53,9 @@ router
           message: req.body.message
         };
         const notification = await Notifications.create(body);
+        const userTo = await Users.findById(store.user);
+        userTo.notifications.push(notification._id);
+        await userTo.save();
         res.status(200).json({
           status: true,
           payload: notification,

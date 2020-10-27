@@ -1,5 +1,39 @@
 const mongoose = require("mongoose");
 
+const cartSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  price: {
+    type: String,
+    required: true
+  },
+  quantity: {
+    type: Number,
+    required: true
+  },
+  availableQuantities: {
+    type: Number,
+    required: true
+  },
+  rating: {
+    type: Number,
+    default: -1
+  },
+  image: {
+    type: String,
+    required: true
+  },
+  item: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Item"
+  }
+}, {
+    timestamps: true
+});
+
 const userSchema = new mongoose.Schema(
   {
     googleId: {
@@ -27,7 +61,8 @@ const userSchema = new mongoose.Schema(
       default: false
     },
     email: {
-      type: String
+      type: String,
+      unique: true
     },
     store: {
       type: mongoose.Schema.Types.ObjectId,
@@ -39,12 +74,7 @@ const userSchema = new mongoose.Schema(
         ref: 'Notification'
       }
     ],
-    cart: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Item"
-      }
-    ]
+    cart: [cartSchema]
   },
   {
     timestamps: true

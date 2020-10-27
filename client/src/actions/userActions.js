@@ -4,7 +4,11 @@ import {
   USER_ISLOADED,
   USER_LOGOUT,
   ADD_ITEM_TO_CART,
-  REMOVE_ITEM_FROM_CART
+  REMOVE_ITEM_FROM_CART,
+  IS_LOADING,
+  IS_LOADED,
+  DELETE_NOTIFICATION,
+  EMPTY_CART
 } from "./types";
 import axios from "axios";
 
@@ -51,7 +55,7 @@ export const deleteUser = () => async (dispatch, getState) => {
 export const addItemCart = item => async dispatch => {
   try {
     dispatch({ type: USER_ISLOADING });
-    const res = await axios.post("/api/users/cart/"+item._id, {});
+    const res = await axios.post("/api/users/cart/"+item.item, item);
     dispatch({
       type: ADD_ITEM_TO_CART,
       payload: res.data.payload
@@ -71,5 +75,44 @@ export const removeItemCart = item => async dispatch => {
     });
   } catch (error) {
     console.error(error);
+  }
+}
+
+export const emptyTheCart = items => async dispatch => {
+  try {
+    dispatch({type: IS_LOADING});
+    for(let item of items) {
+      let res = await axios.delete("/api/users/cart/"+item._id);
+    }
+    dispatch({type: IS_LOADED});
+    dispatch({ type: EMPTY_CART })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const generateNotifications = items => async dispatch => {
+  try {
+    dispatch({ type: IS_LOADING });
+    for(let item of items) {
+      let res = await axios.post("/api/notifications/", item);
+    }
+    dispatch({ type: IS_LOADED});
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export const deleteNotification = notification => async dispatch => {
+  try {
+    dispatch({ type: IS_LOADING });
+    const res = await axios.delete("/api/notifications/"+notification._id);
+    dispatch({
+      type: DELETE_NOTIFICATION,
+      payload: res.data.payload
+    });
+    dispatch({ type: IS_LOADED});
+  } catch (error) {
+    console.log(error);
   }
 }

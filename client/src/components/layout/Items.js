@@ -44,7 +44,14 @@ const Items = props => {
           </Card.Title>
           <div className="mt-3">
             <span style={{ fontSize: 18 }}>Price: {details.price}</span>
-            {!props.canEdit && <button onClick={() => props.addItemCart(details)} className="btn float-right shadow-none store-gn-color add-to-cart-button">Add To Cart</button>}
+            {!props.canEdit && <button onClick={() => props.addItemCart({
+              name: details.name,
+              price: details.price,
+              quantity: 1,
+              item: details._id,
+              rating: details.rating,
+              image: details.image
+            })} className="btn float-right shadow-none store-gn-color add-to-cart-button">Add To Cart</button>}
         </div>
         </Card.Body>
       </Card>

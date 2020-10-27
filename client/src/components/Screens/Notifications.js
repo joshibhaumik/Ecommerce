@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Card, Accordion, Button } from "react-bootstrap";
 import { useAccordionToggle } from "react-bootstrap/AccordionToggle";
 import { Link } from "react-router-dom";
+import { deleteNotification } from "../../actions/userActions";
+import { connect } from "react-redux";
 
 const Toggle = props => {
   const theme = useAccordionToggle(props.eventKey);
@@ -13,7 +15,7 @@ const Toggle = props => {
         </Button>
       </div>
       <div className="float-right">
-        <Button onClick={props.delete} variant="danger">
+        <Button onClick={()=> props.delete(props.notification)} variant="danger">
           <i className="fas fa-trash-alt"></i> Delete
         </Button>
       </div>
@@ -22,22 +24,16 @@ const Toggle = props => {
 };
 
 const Notifications = props => {
-  const [data, setData] = useState([
-    {
-      user: "user",
-      item: "item",
-      store: "store",
-      itemName: "Lorem",
-      email: "testEmail@exampletestemail.test",
-      displayName: "Lorem"
-    }
-  ]);
+  const [data, setData] = useState(props.user.notifications);
 
-  useEffect(() => (document.title = "Notifications"), []);
+  useEffect(() => {
+    document.title = "Notifications";
+  }, []);
 
-  const deleteNotification = () => {
+  const DeleteNotification = notification => {
     if (window.confirm("Do you want to delete this notification?")) {
-      //   proceed to delete the notifications
+      props.deleteNotification(notification);
+      setData(data.filter(e => e._id !== notification._id))
     }
   };
 
@@ -46,7 +42,7 @@ const Notifications = props => {
       <Accordion defaultActiveKey="0">
         <Card>
           <Card.Header>
-            <Toggle delete={deleteNotification} eventKey="1">
+            <Toggle notification={notification} delete={DeleteNotification} eventKey="1">
               View Details
             </Toggle>
           </Card.Header>
@@ -58,7 +54,7 @@ const Notifications = props => {
                     <td>User</td>
                     <td>
                       <Link to={"/user/" + notification.user}>
-                        {notification.displayName}
+                        {notification.userFromDisplayName}
                       </Link>
                     </td>
                   </tr>
@@ -72,7 +68,11 @@ const Notifications = props => {
                   </tr>
                   <tr>
                     <td>User's Email</td>
-                    <td>{notification.email}</td>
+                    <td>{notification.userFromEmail}</td>
+                  </tr>
+                  <tr>
+                    <td>User's Message</td>
+                    <td>{notification.message === "" ? "No Message." : notification.message}</td>
                   </tr>
                 </tbody>
               </table>
@@ -82,10 +82,14 @@ const Notifications = props => {
       </Accordion>
     ))
   ) : (
-    <p className="text-center mt-5 text-muted">
+    <p style={{fontSize:25}} className="text-center mt-5 text-muted">
       You don't have any notifications so far.
     </p>
   );
 };
 
-export default Notifications;
+const mapStateToProps = state => ({
+  user: state.user.user
+});
+
+export default connect(mapStateToProps, { deleteNotification })(Notifications);

@@ -6,7 +6,8 @@ import {
   USER_STORE_CREATED,
   ADD_ITEM_TO_CART,
   REMOVE_ITEM_FROM_CART,
-  DELETE_NOTIFICATION
+  DELETE_NOTIFICATION,
+  EMPTY_CART
 } from "../actions/types";
 
 const initialState = {
@@ -76,6 +77,14 @@ export default function(state = initialState, action) {
         user: {
           ...state.user,
           notifications: state.user.notifications.filter(e => e._id !== action.payload._id )
+        }
+      }
+    case EMPTY_CART:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          cart: []
         }
       }
     default:

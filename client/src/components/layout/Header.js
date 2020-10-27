@@ -26,6 +26,9 @@ const Header = props => {
             <Nav.Link href="/my-store" className="mr-2">
               <i className="fas fa-store"></i> My Store
             </Nav.Link>
+            <Nav.Link href="/notifications" className="mr-2">
+              <i className="fas fa-bell"></i> Notifications ({props.user.notifications ? props.user.notifications.length : 0})
+            </Nav.Link>
             <Nav.Link href="/cart" className="ml-2 mr-2">
               <i className="fas fa-shopping-cart"></i> Cart
             </Nav.Link>

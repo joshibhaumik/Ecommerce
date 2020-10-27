@@ -16,7 +16,7 @@ import DoesNotExists from "./Screens/DoesNotExists";
 import Loading from "./layout/Loading";
 import PrivateRoute from "./features/PrivateRoute";
 
-import { loadCurrentUser } from "../actions/userActions";
+import { loadCurrentUser, generateNotifications } from "../actions/userActions";
 
 const Main = props => {
   useEffect(() => {
@@ -29,7 +29,16 @@ const Main = props => {
     <Router>
       <Switch>
         <Layout>
-          <Loading status={props.isLoading} />
+          <Loading status={props.isLoading || props.loading} />
+          <Route exact path="/test" component={()=> <div><button onClick={()=> props.generateNotifications([
+            {
+              email:"sample@sample.sample",
+              price:"",
+              quantity:"",
+              item:"",
+              message:""
+            },
+          ])}>Generate</button></div>} />
           <Route exact path="/" component={Home} />
           <PrivateRoute
             path={"/notifications"}
@@ -67,11 +76,13 @@ const mapStateToProps = state => {
   return {
     user: state.user.user,
     isAuthenticated: state.user.isAuthenticated,
-    isLoading: state.user.isLoading
+    isLoading: state.user.isLoading,
+    loading: state.error.isLoading
   };
 };
 
 export default connect(
   mapStateToProps,
-  { loadCurrentUser }
+  { loadCurrentUser,
+  generateNotifications }
 )(Main);

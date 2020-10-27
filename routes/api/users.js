@@ -18,7 +18,7 @@ router.use(bodyParser.json());
 router.get("/current_user", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   const id = req.user ? req.user._id : null
-  const user = await Users.findById(id).populate("cart notifications");
+  const user = await Users.findById(id).populate("notifications");
   if (req.user) {
     res.status(200).json({
       status: true,
@@ -175,11 +175,12 @@ router
           error: "Item does not exists."
         });
       } else {
-        user.cart.push(item._id);
+        req.body.availableQuantities = item.quantity;
+        user.cart.push(req.body);
         await user.save();
         res.status(200).json({
           status: true,
-          payload: item,
+          payload: req.body,
           error: ""
         });
       }
@@ -202,12 +203,12 @@ router
           payload: [],
           error: "Item does not exists."
         });
-      } else if(user.cart.includes(item._id)) {
-        user.cart.pull(item._id);
+      } else {
+        user.cart.id(req.params.itemId).remove();
         await user.save();
         res.status(200).json({
           status:true,
-          payload: item,
+          payload: [],
           error:""
         });
       }

@@ -1,23 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../../styles/store.css";
 import Items from "../layout/Items";
-import { connect } from "react-redux";
+import axios from "axios";
 
 const Store = props => {
-  const { storeId } = props.match.params;
+  const [response, setResponse] = useState({});
 
-  useEffect(
-    () => {
-      document.title = "Welcome to - "+"name";
-    },[]);
+  const getStore = async () => {
+    const { storeId } = props.match.params;
+    const res = await axios.get("/api/store/" + storeId);
+    setResponse(res.data.payload);
+    document.title = "Welcome to - " + res.data.payload.name;
+  };
+
+  useEffect(() => {
+    getStore();
+  }, []);
 
   const StoreInfo = () => (
     <div>
       <div>
-        <h3>{storeId}</h3>
+        <h3>{response.name}</h3>
       </div>
       <div className="store-contains">
-        <Items payload={[]} canEdit={true} />
+        <Items payload={response.items} />
       </div>
     </div>
   );
@@ -31,11 +37,6 @@ const Store = props => {
   );
 
   return StoreInfo();
-
 };
 
-const mapStateToProps = state => ({
-  cache: state.cache.store
-});
-
-export default connect(mapStateToProps)(Store);
+export default Store;
