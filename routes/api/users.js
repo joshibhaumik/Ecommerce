@@ -4,7 +4,6 @@ const User = require("../../models/Users");
 const Items = require("../../models/Items");
 const Store = require("../../models/Stores");
 const Reviews = require("../../models/Reviews");
-const Notifications = require("../../models/Notifications");
 const auth = require("../../authenticate");
 const Users = require("../../models/Users");
 
@@ -17,8 +16,8 @@ router.use(bodyParser.json());
 */
 router.get("/current_user", async (req, res) => {
   res.setHeader("Content-Type", "application/json");
-  const id = req.user ? req.user._id : null
-  const user = await Users.findById(id).populate("notifications");
+  const id = req.user ? req.user._id : null;
+  const user = await Users.findById(id);
   if (req.user) {
     res.status(200).json({
       status: true,
@@ -73,10 +72,9 @@ router
       const stores = await Store.remove({});
       const items = await Items.remove({});
       const reviews = await Reviews.remove({});
-      const notifications = await Notifications.remove({});
       res.status(200).json({
         status: true,
-        payload: { users, stores, items, reviews, notifications },
+        payload: { users, stores, items, reviews },
         error: ""
       });
     } catch (error) {
@@ -93,7 +91,7 @@ router
   .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      const user = await User.findById(req.params.userId);
+      const user = await User.findById(req.params.userId).populate("","displayName firstName lastName image store ");
       if (user === null) {
         res
           .status(404)
@@ -159,28 +157,62 @@ router
 
 /*
   @route /api/users/cart/userId
-  @desc add and remove an item from the user cart
+  @desc add an item to the cart
 */
-router
-  .route("/cart/:itemId")
-  .post(auth.verifyUser, async (req, res, next) => {
+router.post("/:userId/cart/", auth.verifyUser, async (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  try {
+    const user = await User.findById(req.user._id);
+    const item = await Items.findById(req.body.item);
+    if (item === null) {
+      req.status(404).json({
+        status: false,
+        payload: [],
+        error: "Item does not exists."
+      });
+    } else {
+      req.body.availableQuantities = item.quantity;
+      user.cart.push(req.body);
+      await user.save();
+      res.status(200).json({
+        status: true,
+        payload: user,
+        error: ""
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      payload: [],
+      error: error
+    });
+  }
+});
+
+/*
+  @route /api/users/cart/userId
+  @desc remove an item from the cart
+*/
+router.delete(
+  "/:userId/cart/:cartItemId",
+  auth.verifyUser,
+  async (req, res) => {
     res.setHeader("Content-Type", "application/json");
     try {
       const user = await User.findById(req.user._id);
-      const item = await Items.findById(req.params.itemId);
+      const item = await Items.findById(req.params.cartItemId);
       if (item === null) {
         req.status(404).json({
           status: false,
           payload: [],
           error: "Item does not exists."
         });
-      } else {
-        req.body.availableQuantities = item.quantity;
-        user.cart.push(req.body);
+      } else if (user.cart.id(req.params.cartItemId) !== null) {
+        user.cart.id(req.params.cartItemId).remove();
         await user.save();
         res.status(200).json({
           status: true,
-          payload: req.body,
+          payload: user,
           error: ""
         });
       }
@@ -191,25 +223,77 @@ router
         error: error
       });
     }
-  })
-  .delete(auth.verifyUser, async (req, res, next) => {
+  }
+);
+
+/*
+  @route /api/users/userId/notification
+  @desc Create notification
+*/
+router.post("/:userId/notifications/", auth.verifyUser, async (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  try {
+    const userFrom = await Users.findById(req.user._id);
+    if (userFrom.email === undefined) {
+      userFrom.email = req.body.email;
+      await userFrom.save();
+    }
+    const item = await Items.findById(req.body.item);
+    if (item === null) {
+      res.status(404).json({
+        status: false,
+        payload: [],
+        error: "Item does not exists"
+      });
+    } else {
+      const store = await Store.findById(item.store);
+      const body = {
+        userFrom: req.user._id,
+        userTo: store.user,
+        item: item._id,
+        itemName: item.name,
+        userFromDisplayName: req.user.displayName,
+        userFromEmail: req.user.email || req.body.email,
+        price: req.body.price,
+        quantity: req.body.quantity,
+        message: req.body.message
+      };
+      const userTo = await Users.findById(store.user);
+      userTo.notifications.push(body);
+      await userTo.save();
+      res.status(200).json({
+        status: true,
+        payload: [],
+        error: ""
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      payload: [],
+      error: error
+    });
+  }
+});
+
+/*
+  @route /api/users/userId/notifications/notificationId
+  @desc Delete a notification
+*/
+router.delete(
+  "/:userId/notifications/:notificationId",
+  auth.verifyUser,
+  async (req, res) => {
     res.setHeader("Content-Type", "application/json");
     try {
       const user = await User.findById(req.user._id);
-      const item = await Items.findById(req.params.itemId);
-      if(item === null) {
-        req.status(404).json({
-          status: false,
-          payload: [],
-          error: "Item does not exists."
-        });
-      } else {
-        user.cart.id(req.params.itemId).remove();
+      if (user.notifications.id(req.params.notificationsId) !== null) {
+        user.notifications.id(req.params.notificationsId).remove();
         await user.save();
-        res.status(200).json({
-          status:true,
-          payload: [],
-          error:""
+        res.json({
+          status: true,
+          payload: user,
+          error: ""
         });
       }
     } catch (error) {
@@ -219,6 +303,7 @@ router
         error: error
       });
     }
-  });
+  }
+);
 
 module.exports = router;

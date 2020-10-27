@@ -51,7 +51,7 @@ export default function(state = init, action) {
       return {
         ...state,
         items: state.store.items.filter(
-          e => String(e._id) !== String(action.payload)
+          e => String(e._id) !== String(action.payload._id)
         )
       };
     default:

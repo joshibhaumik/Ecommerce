@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../../styles/store.css";
 import Items from "../layout/Items";
 import { withRouter } from "react-router-dom";
@@ -6,8 +6,11 @@ import { connect } from "react-redux";
 import { deleteStore, getStore } from "../../actions/storeAction";
 
 const MyStore = props => {
+
   useEffect(() => {
-    props.getStore();
+    if(Object.keys(props.store).length === 0) {
+      props.getStore();
+    }
     document.title = props.user.store
       ? "Welcome to - " + props.store.name
       : "Create Your Own Store";
@@ -29,7 +32,7 @@ const MyStore = props => {
         "Are you sure you want to delete the store? You will lost all your items."
       )
     ) {
-      deleteStore();
+      props.deleteStore();
     }
   };
 
@@ -59,7 +62,7 @@ const MyStore = props => {
       </div>
       <div className="store-contains">
         <Items payload={props.store.items} canEdit={true} />
-        <button title="Create Item" className="btn btn-danger circle-button">
+        <button onClick={()=>props.history.push("/create/item")} title="Create Item" className="btn btn-danger circle-button">
           <i className="fas fa-plus"></i>
         </button>
       </div>

@@ -3,6 +3,7 @@ import { Card } from "react-bootstrap";
 import "../../styles/item.css";
 import { withRouter, Link } from "react-router-dom";
 import { addItemCart, removeItemCart } from "../../actions/userActions";
+import { deleteItemToStore } from "../../actions/storeAction";
 import { connect } from "react-redux";
 
 const Items = props => {
@@ -18,7 +19,9 @@ const Items = props => {
   };
 
   const deleteItem = details => {
-    // delete the item
+    if(window.confirm("Are You Sure, You want To Delete This Item?")) {
+      props.deleteItemToStore(details);
+    }
   }
 
   const RenderAnItem = details => (
@@ -39,8 +42,8 @@ const Items = props => {
         <Card.Img className="render-an-item-image" variant="top" src={details.image} />
         <Card.Body>
           <Card.Title>
-            <Link to={"/item/" + details.itemId}>{details.name}</Link>
-            <kbd className="float-right">{details.rating || "unrated"}</kbd>
+            <Link to={"/item/" + details._id}>{details.name}</Link>
+            <kbd className="float-right">{details.rating === -1 || details.rating === 0 ? "Unrated" : details.rating}</kbd>
           </Card.Title>
           <div className="mt-3">
             <span style={{ fontSize: 18 }}>Price: {details.price}</span>
@@ -75,7 +78,7 @@ const mapStateToProps = state => ({
   user: state.user.user
 });
 
-export default connect(mapStateToProps, { addItemCart, removeItemCart })(withRouter(Items));
+export default connect(mapStateToProps, { addItemCart, removeItemCart, deleteItemToStore })(withRouter(Items));
 
 const RenderAnItemForCart = props => {
   const { details } = props;
@@ -91,7 +94,7 @@ const RenderAnItemForCart = props => {
       </div>
       <div className="offset-sm-2 col-sm-7">
         <h3>
-          <Link to={"/item/"+details._id}>{details.name}</Link> <kbd style={{ fontSize: 15 }}>{details.rating}</kbd>
+          <Link to={"/item/"+details.item}>{details.name}</Link> <kbd style={{ fontSize: 15 }}>{(details.rating === -1 || details.rating === 0)? "Unrated" : details.rating}</kbd>
         </h3>
         <table className="table">
           <tbody>
@@ -104,7 +107,7 @@ const RenderAnItemForCart = props => {
               <td>
                 {quantity}
                 <button
-                  disabled={quantity >= details.quantity}
+                  disabled={quantity >= details.availableQuantities}
                   onClick={() => setQuantity(quantity + 1)}
                   style={{ paddingLeft: 9, paddingRight: 9 }}
                   className="mx-3 btn store-gn-color"
@@ -119,10 +122,6 @@ const RenderAnItemForCart = props => {
                   -
                 </button>
               </td>
-            </tr>
-            <tr>
-              <td>Category</td>
-              <td>{details.category}</td>
             </tr>
           </tbody>
         </table>

@@ -5,7 +5,6 @@ const User = require("../../models/Users");
 const Items = require("../../models/Items");
 const Reviews = require("../../models/Reviews");
 const auth = require("../../authenticate");
-const Notifications = require("../../models/Notifications");
 
 const router = express.Router();
 router.use(bodyparser.json());
@@ -63,7 +62,6 @@ router
       const items = await Items.remove({});
       const reviews = await Reviews.remove({});
       const users = await User.find({});
-      const notifications = await Notifications.remove({});
       for (let user of users) {
         user.store = undefined;
         user.notifications = [];
@@ -71,7 +69,7 @@ router
       }
       res
         .status(200)
-        .json({ status: true, payload: { stores, items, reviews, notifications }, error: "" });
+        .json({ status: true, payload: { stores, items, reviews }, error: "" });
     } catch (error) {
       res.status(500).json({ status: false, payload: {}, error: error });
     }

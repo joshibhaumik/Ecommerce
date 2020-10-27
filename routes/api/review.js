@@ -29,7 +29,7 @@ router
     try {
       const user = await User.findById(req.user._id);
       const item = await Items.findById(req.body.item);
-      if(item === null) {
+      if (item === null) {
         res.status(404).json({
           status: false,
           payload: [],
@@ -44,13 +44,11 @@ router
           item.rating = review.rating;
         } else {
           item.rating =
-            (item.rating * (item.reviews.length - 1) + review.rating) /
-            item.reviews.length;
+            (item.rating * item.reviews.length + review.rating) /
+            (item.reviews.length + 1);
         }
         await item.save();
-        res
-        .status(201)
-        .json({ status: true, payload: review, error: "" });
+        res.status(201).json({ status: true, payload: review, error: "" });
       }
     } catch (error) {
       res.status(500).json({ status: false, payload: {}, error: error });
@@ -176,11 +174,15 @@ router
       } else {
         if (String(req.user._id) === String(review.user)) {
           let item = await Items.findById(review.item);
-          item.rating =
-            (item.rating * item.reviews.length - review.rating) /
-            (item.reviews.length - 1);
+          if(item.reviews.length === 0) {
+            item.rating = 0;
+          } else {
+            item.rating =
+              ((item.rating * item.reviews.length) - review.rating) /
+              (item.reviews.length - 1);
+          }
           item.reviews.pull(review._id);
-          let succ = await item.save();
+          await item.save();
           res.status(200).json({ status: true, payload: review, error: "" });
         } else {
           res.status(403).json({

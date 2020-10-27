@@ -5,7 +5,6 @@ const Store = require("../../models/Stores");
 const Reviews = require("../../models/Reviews");
 const auth = require("../../authenticate");
 const Users = require("../../models/Users");
-const Notifications = require("../../models/Notifications");
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -67,7 +66,6 @@ router
       const items = await Items.remove({});
       const reviews = await Reviews.remove({});
       const stores = await Store.find({});
-      const notifications = await Notifications.remove({});
       const users = await Users.find({});
       for (let store of stores) {
         store.items = [];

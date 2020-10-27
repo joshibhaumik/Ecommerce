@@ -94,7 +94,7 @@ export const deleteItemToStore = itemDetails => async dispatch => {
     if (response.data.status) {
       dispatch({
         type: ITEM_DELETED_FROM_STORE,
-        payload: response.data.payload._id
+        payload: response.data.payload
       });
     }
   } catch (error) {

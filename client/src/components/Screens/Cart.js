@@ -7,7 +7,7 @@ import Items from "../layout/Items";
 import "../../styles/cart.css";
 
 const Cart = props => {
-  const [showModal, toggleModal] = useState(true);
+  const [showModal, toggleModal] = useState(false);
   const [data, setData] = useState(props.user.cart);
   const [email, setEmail] = useState(props.user.email || "");
   const [err, setErr] = useState("");
@@ -46,7 +46,9 @@ const Cart = props => {
         });
       }
       props.generateNotifications(notifications);
-      props.emptyTheCart(data);
+      props.emptyTheCart();
+      setEmail("");
+      setMessage("");
     } else {
       setErr("Enter a valid email");
     }

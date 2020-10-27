@@ -52,12 +52,12 @@ export const deleteUser = () => async (dispatch, getState) => {
   }
 };
 
-export const addItemCart = item => async dispatch => {
+export const addItemCart = item => async (dispatch, getState) => {
   try {
     dispatch({ type: USER_ISLOADING });
-    const res = await axios.post("/api/users/cart/"+item.item, item);
+    const res = await axios.post(`/api/users/${getState().user.user._id}/cart/`, item);
     dispatch({
-      type: ADD_ITEM_TO_CART,
+      type: USER_ISLOADED,
       payload: res.data.payload
     });
   } catch (error) {
@@ -65,12 +65,13 @@ export const addItemCart = item => async dispatch => {
   }
 }
 
-export const removeItemCart = item => async dispatch => {
+export const removeItemCart = item => async (dispatch, getState) => {
   try {
     dispatch({ type: USER_ISLOADING });
-    const res = await axios.delete("/api/users/cart/"+item._id);
+    const res = await axios.delete(`/api/users/${getState().user.user._id}/cart/${item._id}`);
+    console.log(res.data.payload);
     dispatch({
-      type: REMOVE_ITEM_FROM_CART,
+      type: USER_ISLOADED,
       payload: res.data.payload
     });
   } catch (error) {
@@ -78,11 +79,11 @@ export const removeItemCart = item => async dispatch => {
   }
 }
 
-export const emptyTheCart = items => async dispatch => {
+export const emptyTheCart = () => async (dispatch, getState) => {
   try {
     dispatch({type: IS_LOADING});
-    for(let item of items) {
-      let res = await axios.delete("/api/users/cart/"+item._id);
+    for(let item of getState().user.user.cart) {
+      let res = await axios.delete(`/api/users/${getState().user.user._id}/cart/${item._id}`);
     }
     dispatch({type: IS_LOADED});
     dispatch({ type: EMPTY_CART })
@@ -91,11 +92,11 @@ export const emptyTheCart = items => async dispatch => {
   }
 }
 
-export const generateNotifications = items => async dispatch => {
+export const generateNotifications = notifications => async (dispatch, getState) => {
   try {
     dispatch({ type: IS_LOADING });
-    for(let item of items) {
-      let res = await axios.post("/api/notifications/", item);
+    for(let notification of notifications) {
+      await axios.post(`/api/users/${getState().user.user._id}/notifications`, notification);
     }
     dispatch({ type: IS_LOADED});
   } catch (error) {
@@ -103,12 +104,12 @@ export const generateNotifications = items => async dispatch => {
   }
 }
 
-export const deleteNotification = notification => async dispatch => {
+export const deleteNotification = notification => async (dispatch, getState) => {
   try {
     dispatch({ type: IS_LOADING });
-    const res = await axios.delete("/api/notifications/"+notification._id);
+    const res = await axios.delete(`/api/users/${getState().user.user._id}/notifications/${notification._id}`);
     dispatch({
-      type: DELETE_NOTIFICATION,
+      type: USER_ISLOADED,
       payload: res.data.payload
     });
     dispatch({ type: IS_LOADED});

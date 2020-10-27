@@ -12,7 +12,7 @@ const RenderItem = props => {
 
   const getDetails = async id => {
     try {
-      const response = await axios.get("/api/items/5f881ea514f299401c2548d1");
+      const response = await axios.get("/api/items/"+props.match.params.itemId);
       setResponse(response.data.payload);
       setReviews(response.data.payload.reviews);
       document.title = Capitalise(response.data.payload.name);
@@ -42,7 +42,11 @@ const RenderItem = props => {
     try {
       const res = await axios.delete("/api/reviews/"+review._id);
       let { rating } = response;
-      rating = (rating*(reviews.length) - review.rating) / (reviews.length - 1);
+      if (reviews.length === 1) {
+        rating = 0;
+      } else {
+        rating = (rating*(reviews.length) - review.rating) / (reviews.length - 1);
+      }
       setResponse({
         ...response,
         rating: rating
@@ -118,12 +122,10 @@ const RenderItem = props => {
                     {(response.rating === -1 || response.rating === 0) ? "Unrated" : response.rating}
                   </td>
                 </tr>
-                {reviews.length && <tr>
+                <tr>
                   <td>Reviews</td>
-                  <td>
-                    {reviews.length}
-                  </td>
-                </tr>}
+                  <td>{reviews.length}</td>
+                </tr>
                 <tr>
                   <td>Store</td>
                   <td>
