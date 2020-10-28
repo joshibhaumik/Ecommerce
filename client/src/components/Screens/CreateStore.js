@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import { createStore } from "../../actions/storeAction";
+import { createStore, updateStore } from "../../actions/storeAction";
 import "../../styles/store.css";
 
 const CreateStore = props => {
@@ -15,9 +15,6 @@ const CreateStore = props => {
   const [error, setError] = useState(false);
 
   useEffect(()=> {
-    if(props.user.store !== undefined) {
-      props.history.push("/my-store");
-    }
     document.title = "Create your Store";
   }, []);
 
@@ -49,11 +46,22 @@ const CreateStore = props => {
       setError(true);
     } 
     if (storeName !== "" && storeDescription !== "" && check) {
-      props.createStore({
-        name: storeName,
-        description: storeDescription
-      });
-      props.history.push("/my-store");
+      if(details.name === "" && details.description === "") {
+        props.createStore({
+          name: storeName,
+          description: storeDescription
+        });
+        props.history.push("/my-store");
+      }
+      else {
+        props.updateStore({
+          _id: props.user.store,
+          name: storeName,
+          description: storeDescription,
+          user: props.user._id
+        });
+        props.history.push("/my-store");
+      }
     }
   };
 
@@ -142,4 +150,4 @@ const mapStateToProps = state => ({
   user: state.user.user
 });
 
-export default connect(mapStateToProps, { createStore })(withRouter(CreateStore));
+export default connect(mapStateToProps, { createStore, updateStore })(withRouter(CreateStore));

@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
-import { addItemToStore } from "../../actions/storeAction";
+import { addItemToStore, updateStoreItem } from "../../actions/storeAction";
 import { connect } from "react-redux";
 
 const initialState = {
@@ -28,7 +28,12 @@ const ItemCreationReducer = (state = initialState, action) => {
     case "overwrite":
       return {
         ...state,
-        ...[action.details]
+        name: action.name,
+        price: action.price,
+        quantity: action.quantity,
+        description: action.description,
+        image: action.image,
+        category: action.category
       };
     case "write":
       return {
@@ -58,13 +63,20 @@ const ItemCreationReducer = (state = initialState, action) => {
 };
 
 const CreateItem = props => {
-  let details = props.location.state;
+  const details = props.location.state;
   const [state, dispatch] = useReducer(ItemCreationReducer, initialState);
-  if (details !== undefined) {
-    dispatch({ type: "overwrite", details });
-  }
 
   useEffect(() => {
+    if (details !== undefined) {
+      dispatch({ type: "overwrite",
+        name: details.name,
+        category: details.category,
+        image: details.image,
+        description: details.description,
+        price: details.price,
+        quantity: details.quantity
+      });
+    }
     document.title = "Create an Item for your Store";
   }, []);
 
@@ -102,6 +114,18 @@ const CreateItem = props => {
         key: "error",
         value: "Some fields are empty"
       });
+    } else if (details !== undefined) {
+      props.updateStoreItem({
+        _id: details._id,
+        store: details.store,
+        name,
+        description,
+        price,
+        quantity,
+        category,
+        image
+      });
+      props.history.push("/my-store");
     } else {
       props.addItemToStore({
         name:name,
@@ -264,21 +288,21 @@ const CreateItem = props => {
                   "electronics",
                   "stationery",
                   "fruits"
-                ].map(option => (
-                  <option value={option}>{Capitalise(option)}</option>
+                ].map((option, i) => (
+                  <option key={i} value={option}>{Capitalise(option)}</option>
                 ))}
               </select>
             </div>
             <div className="col-sm-12 my-4 form-group input-field-container">
-              <div class="custom-file">
+              <div className="custom-file">
                 <input
                   onChange={e => uploadImageToCloud(e.target.files[0])}
                   type="file"
                   accept=".png,.jpg,.jpeg"
-                  class="custom-file-input"
+                  className="custom-file-input"
                   id="image"
                 />
-                <label class="custom-file-label" htmlFor="image">
+                <label className="custom-file-label" htmlFor="image">
                   {state.imageName || "Upload Item Image"}
                 </label>
               </div>
@@ -363,4 +387,4 @@ const mapStateToProps = state => ({
   user: state.user.user
 });
 
-export default connect(mapStateToProps, { addItemToStore })(withRouter(CreateItem));
+export default connect(mapStateToProps, { addItemToStore, updateStoreItem })(withRouter(CreateItem));

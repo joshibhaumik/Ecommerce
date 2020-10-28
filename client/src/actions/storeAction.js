@@ -6,7 +6,9 @@ import {
   STORE_DELETED,
   USER_STORE_CREATED,
   ITEM_DELETED_FROM_STORE,
-  ITEM_ADDED_TO_STORE
+  ITEM_ADDED_TO_STORE,
+  IS_LOADED,
+  IS_LOADING
 } from "./types";
 
 export const getStore = () => async (dispatch, getState) => {
@@ -102,3 +104,13 @@ export const deleteItemToStore = itemDetails => async dispatch => {
     console.error(error);
   }
 };
+
+export const updateStoreItem = details => async dispatch => {
+  try {
+    dispatch({ type: IS_LOADING });
+    const res = await axios.put("/api/items/"+details._id, details);
+    dispatch({ type: IS_LOADED });
+  } catch (error) {
+    console.log(error);
+  }
+}

@@ -13,13 +13,14 @@ const Items = props => {
 
   const editItem = detail => {
     props.history.push({
-      pathname: "/items/create",
+      pathname: "/create/item",
       state: detail
     });
   };
 
   const deleteItem = details => {
     if(window.confirm("Are You Sure, You want To Delete This Item?")) {
+      props.del(details);
       props.deleteItemToStore(details);
     }
   }
@@ -65,7 +66,7 @@ const Items = props => {
     <div className={props.forCart?"":"row ml-5"}>
       {props.payload.map((item, i) =>
         props.forCart ? (
-          <RenderAnItemForCart key={i} details={item} remove={props.removeItemCart} />
+          <RenderAnItemForCart key={i} details={item} remove_={props.remove_} remove={props.removeItemCart} />
         ) : (
           RenderAnItem(item)
         )
@@ -126,7 +127,10 @@ const RenderAnItemForCart = props => {
           </tbody>
         </table>
         <div>
-          <button className="btn btn-danger" onClick={()=> props.remove(details)}>Remove Item</button>
+          <button className="btn btn-danger" onClick={()=> {
+            props.remove(details);
+            props.remove_(details);
+          }}>Remove Item</button>
         </div>
       </div>
     </div>

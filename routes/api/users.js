@@ -156,7 +156,7 @@ router
   });
 
 /*
-  @route /api/users/cart/userId
+  @route /api/users/userId/cart
   @desc add an item to the cart
 */
 router.post("/:userId/cart/", auth.verifyUser, async (req, res) => {
@@ -190,7 +190,7 @@ router.post("/:userId/cart/", auth.verifyUser, async (req, res) => {
 });
 
 /*
-  @route /api/users/cart/userId
+  @route /api/users/userId/cart/cartId
   @desc remove an item from the cart
 */
 router.delete(
@@ -200,22 +200,15 @@ router.delete(
     res.setHeader("Content-Type", "application/json");
     try {
       const user = await User.findById(req.user._id);
-      const item = await Items.findById(req.params.cartItemId);
-      if (item === null) {
-        req.status(404).json({
-          status: false,
-          payload: [],
-          error: "Item does not exists."
-        });
-      } else if (user.cart.id(req.params.cartItemId) !== null) {
+      if (user.cart.id(req.params.cartItemId) !== null) {
         user.cart.id(req.params.cartItemId).remove();
         await user.save();
-        res.status(200).json({
-          status: true,
-          payload: user,
-          error: ""
-        });
       }
+      res.status(200).json({
+        status: true,
+        payload: user,
+        error: ""
+      });
     } catch (error) {
       res.status(500).json({
         status: false,
@@ -281,22 +274,24 @@ router.post("/:userId/notifications/", auth.verifyUser, async (req, res) => {
   @desc Delete a notification
 */
 router.delete(
-  "/:userId/notifications/:notificationId",
+  "/:userId/notifications/:notificationsId",
   auth.verifyUser,
   async (req, res) => {
     res.setHeader("Content-Type", "application/json");
     try {
       const user = await User.findById(req.user._id);
+      console.log()
       if (user.notifications.id(req.params.notificationsId) !== null) {
         user.notifications.id(req.params.notificationsId).remove();
         await user.save();
-        res.json({
-          status: true,
-          payload: user,
-          error: ""
-        });
       }
+      res.json({
+        status: true,
+        payload: user,
+        error: ""
+      });
     } catch (error) {
+      console.log(error);
       res.status(500).json({
         status: false,
         payload: [],

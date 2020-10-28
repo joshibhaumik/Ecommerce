@@ -12,6 +12,7 @@ const Header = props => {
 
   const Logout = () => {
     props.logoutUser();
+    props.history.push("/");
   };
 
   return (

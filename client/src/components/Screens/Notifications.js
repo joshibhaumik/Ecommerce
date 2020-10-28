@@ -38,8 +38,8 @@ const Notifications = props => {
   };
 
   return data.length ? (
-    data.map(notification => (
-      <Accordion defaultActiveKey="0">
+    data.map((notification, i) => (
+      <Accordion key={i} defaultActiveKey="0">
         <Card>
           <Card.Header>
             <Toggle notification={notification} delete={DeleteNotification} eventKey="1">

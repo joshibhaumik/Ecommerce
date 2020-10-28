@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { connect } from "react-redux";
 
 const ReviewModal = props => {
-  const [comment, setComment] = useState(props.comment_ || "");
+  const { details } = props;
+  const [comment, setComment] = useState("");
   const [commentError, setCommentError] = useState("");
-  const [rating, setRating] = useState(props.rating_ || 1);
+  const [rating, setRating] = useState(1);
+
+  useEffect(() => {
+    setComment(details.review);
+    setRating(details.rating);
+  }, [details]);
 
   const validateComment = () => {
     if (comment === "") {
@@ -27,13 +33,24 @@ const ReviewModal = props => {
     } else {
       validateComment();
       if (comment !== "") {
-        const response = await axios.post("/api/reviews/", {
-          displayName: props.user.displayName,
-          item: props.id,
-          review: comment,
-          rating: rating 
-        });
-        props.addReview(response.data.payload);
+        if(details !== undefined) {
+          const response = await axios.put("/api/reviews/"+details._id, {
+            review: comment,
+            rating: rating,
+            user: details.user,
+            item: details.item,
+            displayName: details.displayName
+          });
+          props.updateReview(details, response.data.payload);
+        } else {
+          const response = await axios.post("/api/reviews/", {
+            displayName: props.user.displayName,
+            item: props.id,
+            review: comment,
+            rating: rating 
+          });
+          props.addReview(response.data.payload);
+        }
       }
       reset();
     }

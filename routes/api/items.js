@@ -114,28 +114,19 @@ router
     res.setHeader("Content-Type", "application/json");
     try {
       if (String(req.user.store) === String(req.body.store)) {
-        let store = await Store.findById(req.user.store);
-        if (store === null) {
+        let item = await Items.findByIdAndUpdate(
+          req.params.itemId,
+          { $set: req.body },
+          { new: true }
+        );
+        if (item === null) {
           res.status(404).json({
             status: false,
             payload: [],
-            error: "Store does not exists"
+            error: "Item does not exists"
           });
         } else {
-          let item = await Items.findByIdAndUpdate(
-            req.params.itemId,
-            { $set: req.body },
-            { new: true }
-          );
-          if (item === null) {
-            res.status(404).json({
-              status: false,
-              payload: [],
-              error: "Item does not exists"
-            });
-          } else {
-            res.status(204).json({ status: true, payload: item, error: "" });
-          }
+          res.status(204).json({ status: true, payload: item, error: "" });
         }
       } else {
         res.status(403).json({

@@ -4,24 +4,39 @@ import Items from "../layout/Items";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { deleteStore, getStore } from "../../actions/storeAction";
+import axios from "axios";
 
 const MyStore = props => {
+  const [items, setItems] = useState([]);
+  const [response, setResponse] = useState({});
+
+  const getStore = async () => {
+    try {
+      const res = await axios.get("/api/store/" + props.user.store);
+      setResponse(res.data.payload);
+      setItems(res.data.payload.items);
+      document.title = props.user.store
+        ? "Welcome to - " + res.data.payload.name
+        : "Create Your Own Store";
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    if(Object.keys(props.store).length === 0) {
-      props.getStore();
-    }
-    document.title = props.user.store
-      ? "Welcome to - " + props.store.name
-      : "Create Your Own Store";
+    getStore();
   }, []);
+
+  const deleteAnItem = item => {
+    setItems(items.filter(e => e._id !== item._id));
+  };
 
   const handleEdit = () => {
     props.history.push({
       pathname: "/create/store",
       state: {
-        name: props.store.name,
-        description: props.store.description
+        name: response.name,
+        description: response.description
       }
     });
   };
@@ -39,7 +54,7 @@ const MyStore = props => {
   const createdStore = () => (
     <div>
       <div>
-        <h3>{props.store.name}</h3>
+        <h3>{response.name}</h3>
       </div>
       <div>
         <button
@@ -61,8 +76,12 @@ const MyStore = props => {
         </button>
       </div>
       <div className="store-contains">
-        <Items payload={props.store.items} canEdit={true} />
-        <button onClick={()=>props.history.push("/create/item")} title="Create Item" className="btn btn-danger circle-button">
+        <Items payload={items} canEdit={true} del={deleteAnItem} />
+        <button
+          onClick={() => props.history.push("/create/item")}
+          title="Create Item"
+          className="btn btn-danger circle-button"
+        >
           <i className="fas fa-plus"></i>
         </button>
       </div>
@@ -85,8 +104,7 @@ const MyStore = props => {
 };
 
 const mapStateToProps = state => ({
-  user: state.user.user,
-  store: state.store.store
+  user: state.user.user
 });
 
 export default connect(

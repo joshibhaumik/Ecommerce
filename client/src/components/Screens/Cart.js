@@ -41,18 +41,23 @@ const Cart = props => {
           email: email,
           price: item.price,
           quantity: item.quantity,
-          item: item._id,
+          item: item.item,
           message: message
         });
       }
       props.generateNotifications(notifications);
       props.emptyTheCart();
+      setData([]);
       setEmail("");
       setMessage("");
     } else {
       setErr("Enter a valid email");
     }
   };
+
+  const removeItemFromCart = cartItem => {
+    setData(data.filter(e => e._id !== cartItem._id));
+  }
 
   const CheckOutModal = () => (
     <Modal show={showModal} onHide={() => toggleModal(false)}>
@@ -108,11 +113,12 @@ const Cart = props => {
   );
 
   return (
-    <div className="center-it">
+    <div style={{width:750}} className="center-it">
       <div className="float-left">
         <button
           onClick={() => toggleModal(true)}
           className="btn shadow-none store-gn-color check-out-button"
+          disabled={!Boolean(data.length)}
         >
           Check Out & Place Order
         </button>
@@ -121,7 +127,7 @@ const Cart = props => {
         <pre className="amount">Amount: {calculateAmount()}</pre>
       </div>
       <section className="mt-5">
-        <Items payload={data} forCart={true} />
+        <Items payload={data} forCart={true} remove_={removeItemFromCart} />
       </section>
       {showModal && CheckOutModal()}
     </div>

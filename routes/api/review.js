@@ -113,21 +113,15 @@ router
     res.setHeader("Content-Type", "application/json");
     try {
       if (String(req.user._id) === String(req.body.user)) {
-        const user = User.findById(req.body.user);
         const item = await Items.findById(req.body.item);
-        if (user === null) {
-          res.status(404).json({
-            status: false,
-            payload: [],
-            error: "User does not exists"
-          });
-        } else if (item === null) {
+        if (item === null) {
           res.status(404).json({
             status: false,
             payload: [],
             error: "Item does not exists"
           });
         } else {
+          const review_ = await Reviews.findById(req.params.reviewId);
           const review = await Reviews.findByIdAndUpdate(
             req.params.reviewId,
             { $set: req.body },
@@ -141,11 +135,8 @@ router
             });
           } else {
             item.rating =
-              (item.rating * item.reviews.length -
-                review_.rating +
-                review.rating) /
-              item.reviews.length;
-            const succ = await item.save();
+              ((item.rating * item.reviews.length) - review_.rating + review.rating) / (item.reviews.length);
+            await item.save();
             res.status(200).json({ status: true, payload: review, error: "" });
           }
         }
