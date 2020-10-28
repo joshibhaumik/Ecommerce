@@ -1,5 +1,5 @@
 # OnlineStore
-OnlineStore website with ReactJS, Redux, NodeJS, and MongoDB.
+OnlineStore is a website built with ReactJS, Redux, NodeJS, and MongoDB.
 
 # Overview
 This is a general online store. Whereby, you can create your own Store, add items to it, review other peoples items. This project uses Google OAuth 2.0 for logging / creating your account. Whenever you buy an item, the owner will be notified about your need for that item.
