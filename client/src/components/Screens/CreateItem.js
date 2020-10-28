@@ -148,11 +148,11 @@ const CreateItem = props => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "ml_default");
-      formData.append("cloud_name", "dqaiapvgm");
+      formData.append("XXX", "ml_default");
+      formData.append("XXX", "dqaiapvgm");
 
       const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/dqaiapvgm/image/upload",
+        "",
         formData
       );
 

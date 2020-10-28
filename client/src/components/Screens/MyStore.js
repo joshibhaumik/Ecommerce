@@ -3,7 +3,7 @@ import "../../styles/store.css";
 import Items from "../layout/Items";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import { deleteStore, getStore } from "../../actions/storeAction";
+import { deleteStore } from "../../actions/storeAction";
 import axios from "axios";
 
 const MyStore = props => {
@@ -110,7 +110,6 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {
-    deleteStore,
-    getStore
+    deleteStore
   }
 )(withRouter(MyStore));

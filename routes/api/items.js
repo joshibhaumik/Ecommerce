@@ -86,7 +86,7 @@ router
 */
 router
   .route("/:itemId")
-  .get(auth.verifyUser, async (req, res, next) => {
+  .get(async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
       let item = await Items.findById(req.params.itemId).populate("reviews");

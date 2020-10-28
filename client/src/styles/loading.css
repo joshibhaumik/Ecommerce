@@ -31,4 +31,5 @@
   color: white;
   font-size: 25px;
   top: calc(25% + 90px);
+  z-index: 500;
 }

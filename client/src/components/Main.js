@@ -29,7 +29,7 @@ const Main = props => {
     <Router>
       <Switch>
         <Layout>
-          <Loading status={props.isLoading || props.loading} />
+          <Loading status={props.loading} />
           <Route exact path="/test" component={()=> <div><button onClick={()=> props.generateNotifications([
             {
               email:"sample@sample.sample",
@@ -76,7 +76,6 @@ const mapStateToProps = state => {
   return {
     user: state.user.user,
     isAuthenticated: state.user.isAuthenticated,
-    isLoading: state.user.isLoading,
     loading: state.error.isLoading
   };
 };

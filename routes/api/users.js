@@ -91,13 +91,25 @@ router
   .get(auth.verifyUser, async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
-      const user = await User.findById(req.params.userId).populate("","displayName firstName lastName image store ");
+      const user = await User.findById(req.params.userId);
       if (user === null) {
         res
           .status(404)
           .json({ status: false, payload: [], error: "User not found" });
       } else {
-        res.status(200).json({ status: true, payload: user, error: "" });
+        res
+          .status(200)
+          .json({
+            status: true,
+            payload: {
+              displayName: user.displayName,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              image: user.image,
+              store: user.store
+            },
+            error: ""
+          });
       }
     } catch (error) {
       res.status(500).json({ status: false, payload: {}, error: error });
@@ -280,7 +292,7 @@ router.delete(
     res.setHeader("Content-Type", "application/json");
     try {
       const user = await User.findById(req.user._id);
-      console.log()
+      console.log();
       if (user.notifications.id(req.params.notificationsId) !== null) {
         user.notifications.id(req.params.notificationsId).remove();
         await user.save();

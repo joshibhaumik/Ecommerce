@@ -81,7 +81,7 @@ router
 */
 router
   .route("/:storeId")
-  .get(auth.verifyUser, async (req, res, next) => {
+  .get(async (req, res, next) => {
     res.setHeader("Content-Type", "application/json");
     try {
       let store = await Store.findById(req.params.storeId).populate("items");
